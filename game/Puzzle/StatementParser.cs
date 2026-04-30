@@ -1,10 +1,6 @@
 using System;
 using UnityEngine;
 
-/// <summary>
-/// Very simple difficulty label for balancing the statement pool.
-/// This is about PLAYER solving difficulty, not code difficulty.
-/// </summary>
 public enum StatementDifficulty
 {
     Easy,
@@ -20,19 +16,13 @@ public class StatementParser
     [Tooltip("Choose this once when the puzzle is generated. Do NOT randomize in Evaluate().")]
     [Min(0)]
     public int variant = 0;
-
-    // Target NPC indices used by different statement types.
-    // Not every statement uses every field.
+    
     public int a;
     public int b;
     public int c;
     public int d;
     public int e;
 
-    /// <summary>
-    /// Returns how many variants this statement family has.
-    /// Example: IsKnight has 4 variants in your current design.
-    /// </summary>
     public int GetVariantCount(int npcCount)
     {
         switch (statement)
@@ -71,11 +61,7 @@ public class StatementParser
                 return 1;
         }
     }
-
-    /// <summary>
-    /// Whether this statement family is safe to use on floors where Peasant exists.
-    /// "Would say..." meta-statements are NOT safe for Peasant floors.
-    /// </summary>
+    
     public bool IsCompatibleWithPeasantFloor()
     {
         switch (statement)
@@ -91,18 +77,11 @@ public class StatementParser
         }
     }
 
-    /// <summary>
-    /// Suggested balancing category for this statement.
-    /// This is rough and mainly for level progression.
-    /// </summary>
     public StatementDifficulty GetSuggestedDifficulty()
     {
         switch (statement)
         {
             case StatementList.IsKnight:
-                // Variant 1: "A is a knight." = easy
-                // Variant 3: "Not A knight." = easy
-                // Variants with self-reference + OR are harder
                 return (variant == 1 || variant == 3) ? StatementDifficulty.Easy : StatementDifficulty.Medium;
 
             case StatementList.IsKnave:
@@ -129,11 +108,6 @@ public class StatementParser
         }
     }
 
-    /// <summary>
-    /// Evaluates whether the content of the statement is true under the given role assignment.
-    /// This does NOT check whether the speaker is allowed to say it.
-    /// That speaker-role consistency is handled by the puzzle validator.
-    /// </summary>
     public bool Evaluate(Role[] roles, int selfIndex)
     {
         bool IsKnight(int i) => roles[i] == Role.Knight;
@@ -178,20 +152,19 @@ public class StatementParser
                 break;
 
             case StatementList.OnlyKnightSayKnight:
-                // Safe ONLY on Knight/Knave floors.
-                // Interpreted as: "Only a knight could consistently utter 'A is a knight'."
+                // "Only a knight would say that A is a knight."
                 return IsKnight(a);
 
             case StatementList.OnlyKnightSayKnave:
-                // Safe ONLY on Knight/Knave floors.
+                 // "Only a knight would say that A is a knave."
                 return IsKnave(a);
 
             case StatementList.OnlyKnaveSayKnight:
-                // Safe ONLY on Knight/Knave floors.
+                 // "Only a kniave would say that A is a knight."
                 return IsKnave(a);
 
             case StatementList.OnlyKnaveSayKnave:
-                // Safe ONLY on Knight/Knave floors.
+                 // "Only a knave would say that A is a knave."
                 return IsKnight(a);
 
             case StatementList.EitherKnightOrKnight:
@@ -207,7 +180,6 @@ public class StatementParser
 
                     case 2:
                         // "Neither A nor B is a knight."
-                        // IMPORTANT: use !IsKnight, not IsKnave, so this stays Peasant-safe.
                         return !IsKnight(a) && !IsKnight(b);
                 }
                 break;
@@ -331,11 +303,7 @@ public class StatementParser
         Debug.LogWarning($"Invalid statement/variant combination: {statement} / {variant}");
         return false;
     }
-
-    /// <summary>
-    /// Converts the stored statement into display text.
-    /// This must depend only on statement + variant + indices, NOT on random runtime state.
-    /// </summary>
+    
     public string ToText(string[] names, int selfIndex)
     {
         string A = GetName(names, a);
