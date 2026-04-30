@@ -8,7 +8,6 @@ public class PuzzleGenerator
 
     private int npcCount;
     
-    // Track which statement types have been used
     HashSet<StatementList> usedStatementTypes = new HashSet<StatementList>();
 
     public PuzzleData Generate(int floorIndex, System.Random rng)
@@ -42,7 +41,7 @@ public class PuzzleGenerator
             var solutions = PuzzleValidator.FindSolutions(puzzle);
             Debug.Log($"Attempt {attempt}: solutions = {solutions.Count}");
 
-            if (solutions.Count == 1)  // Exactly one solution
+            if (solutions.Count == 1)
                 break;
         }
 
@@ -99,12 +98,12 @@ public class PuzzleGenerator
         }
         else if (tier == StatementDifficulty.Medium)
         {
-            pool.Add(StatementList.IsKnight); // variants 0/2 are medium
+            pool.Add(StatementList.IsKnight);
             pool.Add(StatementList.BothAreKnights);
             pool.Add(StatementList.BothAreKnaves);
             pool.Add(StatementList.RoleSame);
         }
-        else // Hard
+        else
         {
             pool.AddRange(new[] { StatementList.EitherKnightOrKnight, StatementList.EitherKnightOrKnave,
                     StatementList.EitherKnaveOrKnave, StatementList.ExactlyOneIsKnight,
@@ -129,7 +128,7 @@ public class PuzzleGenerator
         else if (stmt.statement.ToString().Contains("Either") || stmt.statement.ToString().Contains("Both") || stmt.statement == StatementList.RoleSame)
         {
             stmt.a = PickDistinctTarget(npc, npcCount, rng);
-            stmt.b = PickDistinctTarget(npc, npcCount, rng, stmt.a);  // Already excludes both 'npc' and 'stmt.a'
+            stmt.b = PickDistinctTarget(npc, npcCount, rng, stmt.a);
 
             if (stmt.a == npc || stmt.b == npc)
             {
@@ -137,12 +136,10 @@ public class PuzzleGenerator
                 stmt.b = PickDistinctTarget(npc, npcCount, rng);
             }
 
-            // If 'b' ended up same as 'a', try again with different method
             if (stmt.b == stmt.a || stmt.b == -1)
             {
-                // For 2-NPC floors, use speaker + other NPC
-                stmt.a = npc;  // Speaker
-                stmt.b = npc == 0 ? 1 : 0;  // Other NPC
+                stmt.a = npc;
+                stmt.b = npc == 0 ? 1 : 0;
             }
         }
     }
