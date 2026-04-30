@@ -46,7 +46,7 @@ public class SceneLoader : MonoBehaviour
             // case "chapter3":
             //     targetSceneName = "title";
             //
-            //     PlayerPrefs.SetInt("UnlockedLevel", 4); // unlock next scene
+            //     PlayerPrefs.SetInt("unlock", 4)
             //     PlayerPrefs.Save();
             //
             //     break;
