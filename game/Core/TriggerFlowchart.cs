@@ -9,8 +9,6 @@ public class TriggerFlowchart : MonoBehaviour {
 
     private NPCController nearbyNPC;
 
-    // protected FixedJoybutton joybutton;
-
     private void OnTriggerEnter(Collider col)
     {
         if (col.CompareTag(triggerTag))
