@@ -47,20 +47,8 @@ public class PlayMenuTextController : MonoBehaviour, IPointerEnterHandler, IPoin
     public void OnPointerExit(PointerEventData eventData)
     {
         isHovered = false;
-        // isPressed = false; // IMPORTANT: prevents stuck pressed state
     }
-
-    // public void OnPointerDown(PointerEventData eventData)
-    // {
-    //     if (!button.interactable) return;
-    //     isPressed = true;
-    // }
-    //
-    // public void OnPointerUp(PointerEventData eventData)
-    // {
-    //     // isPressed = false;
-    // }
-
+    
     private void ApplyColor(Color c)
     {
         if (text != null)
