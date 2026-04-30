@@ -1,9 +1,5 @@
 using UnityEngine;
 
-/// <summary>
-/// One spawned NPC in the room.
-/// Holds its label and generated statement text.
-/// </summary>
 public class NPCController: MonoBehaviour
 {
     [Header("Optional Visual References")]
@@ -31,9 +27,6 @@ public class NPCController: MonoBehaviour
         Debug.Log($"NPC {index} statementController: " + (controller == null ? "NULL" : "OK"));
     }
 
-    /// <summary>
-    /// Call this from your player interaction system when player presses Z near the NPC.
-    /// </summary>
     public void InteractShowLine()
     {
         statementController.ShowLine(statementText);
@@ -43,11 +36,7 @@ public class NPCController: MonoBehaviour
     {
         statementController.ShowName(npcName);
     }
-
-    /// <summary>
-    /// Called by FungusDialogueRunner after the line closes.
-    /// This is where we mark the statement as discovered.
-    /// </summary>
+    
     public void OnDialogueFinished()
     {
         floorManager?.RevealStatement(npcIndex);
