@@ -2,10 +2,6 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Fungus;
 
-/// <summary>
-/// Holds persistent run state: floor, health, item, current puzzle.
-/// Keep this alive across scenes with DontDestroyOnLoad.
-/// </summary>
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
@@ -17,7 +13,6 @@ public class GameManager : MonoBehaviour
     public int currentHealth { get; private set; } = 3;
     public ItemType heldItem { get; private set; } = ItemType.None;
 
-    // current generated puzzle for the gameplay scene
     public PuzzleData currentPuzzle;
     public RunInfoController runInfoController;
 
@@ -100,30 +95,6 @@ public class GameManager : MonoBehaviour
         SaveRun();
 
         return currentHealth <= 0;
-    }
-
-    public bool HealPlayer(int amount)
-    {
-        if (currentHealth >= maxHealth)
-            return false;
-
-        currentHealth = Mathf.Min(maxHealth, currentHealth + amount);
-
-        runInfoController.ChangeHealth(false);
-        SaveRun();
-        return true;
-    }
-
-    public void GiveItem(ItemType item)
-    {
-        heldItem = item;
-        SaveRun();
-    }
-
-    public void ClearItem()
-    {
-        heldItem = ItemType.None;
-        SaveRun();
     }
 
     public void AdvanceFloor()
