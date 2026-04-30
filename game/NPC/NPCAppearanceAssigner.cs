@@ -3,8 +3,8 @@ using UnityEngine;
 
 public class NPCAppearanceAssigner : MonoBehaviour
 {
-    public Material[] headMaterials; // 5
-    public Material[] bodyMaterials; // 5
+    public Material[] headMaterials;
+    public Material[] bodyMaterials;
 
     public void AssignUniqueAppearances(List<NPCAppearance> npcs, System.Random rng)
     {
@@ -18,7 +18,6 @@ public class NPCAppearanceAssigner : MonoBehaviour
             }
         }
 
-        // shuffle
         for (int i = 0; i < combos.Count; i++)
         {
             int j = rng.Next(i, combos.Count);
