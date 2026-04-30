@@ -4,23 +4,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-/// <summary>
-/// Builds one floor from the current puzzle data.
-/// If no puzzle exists yet, it asks the generator to create one.
-/// </summary>
 public class FloorManager : MonoBehaviour
 {
     [Header("Spawning")]
     public GameObject npcPrefab;
-    public Transform[] npcSpawnPoints; // Set up enough points for up to 5 NPCs
+    public Transform[] npcSpawnPoints;
     public static string[] npcLabels = { "P", "Q", "R", "S", "T", "U" };
 
     [Header("Dialogue")]
     public StatementController statementController;
 
     [Header("Appearance")]
-    public Material[] headMaterials; // 5
-    public Material[] bodyMaterials; // 5
+    public Material[] headMaterials; 
+    public Material[] bodyMaterials;
 
     [Header("UI")]
     public AnswerPanelController answerPanelController;
@@ -33,8 +29,6 @@ public class FloorManager : MonoBehaviour
     private readonly List<NPCController> spawnedNpcs = new List<NPCController>();
     private System.Random rng = new System.Random();
 
-    // Use the generator pattern from the earlier answer.
-    // Adapt it so it fills StatementParser.variant instead of random runtime state.
     private PuzzleGenerator generator = new PuzzleGenerator();
 
     private PuzzleData currentPuzzle => GameManager.Instance.currentPuzzle;
@@ -67,7 +61,7 @@ public class FloorManager : MonoBehaviour
         for (int i = 0; i < spawnPoints.Length; i++)
             npcSpawnPoints[i] = spawnPoints[i].GetComponent<Transform>();
 
-        GenerateFloor(); // IMPORTANT: regenerate after refs exist
+        GenerateFloor();
     }
 
     public void GenerateFloor()
@@ -84,7 +78,7 @@ public class FloorManager : MonoBehaviour
             Debug.Log("Using existing puzzle...");
         }
         PuzzleData puzzle = GameManager.Instance.currentPuzzle;
-        // If loaded puzzle has missing arrays, regenerate
+       
         if (puzzle.npcInfo == null || puzzle.role == null)
         {
             Debug.Log("Loaded puzzle incomplete - regenerating...");
@@ -115,11 +109,9 @@ public class FloorManager : MonoBehaviour
 
         for (int i = 0; i < puzzle.npcCount; i++)
         {
-            // Fill labels if generator didn't already
             if (string.IsNullOrEmpty(puzzle.npcInfo[i].label))
                 puzzle.npcInfo[i].label = npcLabels[i];
 
-            // Fill statement text if generator didn't cache it
             if (string.IsNullOrEmpty(puzzle.npcInfo[i].statementText) && puzzle.npcInfo[i].statement != null)
                 puzzle.npcInfo[i].statementText = puzzle.npcInfo[i].statement.ToText(npcLabels, i);
         }
@@ -158,7 +150,7 @@ public class FloorManager : MonoBehaviour
                 available.Add(i);
 
         if (available.Count == 0)
-            available.Add(rng.Next(0, npcSpawnPoints.Length)); // reset if all used
+            available.Add(rng.Next(0, npcSpawnPoints.Length));
 
         int chosen = available[rng.Next(0, available.Count)];
         usedSpawnIndices.Add(chosen);
@@ -191,7 +183,6 @@ public class FloorManager : MonoBehaviour
             }
         }
 
-        // Shuffle combinations
         for (int i = 0; i < combos.Count; i++)
         {
             int j = rng.Next(i, combos.Count);
@@ -236,9 +227,6 @@ public class FloorManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Called by NPCController after Fungus line closes.
-    /// </summary>
     public void RevealStatement(int npcIndex)
     {
         if (currentPuzzle == null)
@@ -256,9 +244,6 @@ public class FloorManager : MonoBehaviour
         GameManager.Instance.SaveRun();
     }
 
-    /// <summary>
-    /// Hook this up to your submit altar/button.
-    /// </summary>
     public void SubmitAnswers()
     {
         if (currentPuzzle == null)
@@ -267,7 +252,6 @@ public class FloorManager : MonoBehaviour
         currentPuzzle.playerGuesses = answerPanelController.GetGuesses();
         GameManager.Instance.SaveRun();
 
-        // Debug: print ALL assignments found by validator
         var solutions = PuzzleValidator.FindSolutions(currentPuzzle);
         Debug.Log($"Total solutions: {solutions.Count}");
         for (int s = 0; s < solutions.Count; s++)
@@ -277,7 +261,7 @@ public class FloorManager : MonoBehaviour
                 sol += $"{currentPuzzle.npcInfo[i].label}={solutions[s][i]} ";
             Debug.Log($"Solution {s}: {sol}");
         }
-        // Debug: show player's guesses vs actual solution
+
         for (int i = 0; i < currentPuzzle.npcCount; i++)
         {
             string label = currentPuzzle.npcInfo[i].label;
@@ -362,102 +346,10 @@ public class FloorManager : MonoBehaviour
     {
         answerPanelController.RevealAll(currentPuzzle.role);
 
-        // Optional debug print
         for (int i = 0; i < currentPuzzle.npcCount; i++)
         {
             Debug.Log($"{currentPuzzle.npcInfo[i].label} = {currentPuzzle.role[i]}");
         }
-    }
-
-    /// <summary>
-    /// Very simple reward rule:
-    /// give a random item after clearing floors 3, 6, 9, if player's slot is empty.
-    /// You can replace this with actual pickup spawning if you prefer.
-    /// </summary>
-    private void DropItem()
-    {
-        int justClearedFloor = GameManager.Instance.currentFloor;
-
-        if (justClearedFloor == 3 || justClearedFloor == 6 || justClearedFloor == 9)
-        {
-            if (GameManager.Instance.heldItem == ItemType.None)
-            {
-                ItemType randomItem = (ItemType)rng.Next(1, 7); // 1..3
-                GameManager.Instance.GiveItem(randomItem);
-                Debug.Log($"Received item: {randomItem}");
-            }
-        }
-    }
-
-    /// <summary>
-    /// Hook this to your "use item" button/key.
-    /// </summary>
-    public bool TryUseHeldItem()
-    {
-        switch (GameManager.Instance.heldItem)
-        {
-            case ItemType.None:
-                return false;
-
-            case ItemType.Tonic:
-                if (!GameManager.Instance.HealPlayer(1))
-                {
-                    Debug.Log("Health already full.");
-                    return false;
-                }
-
-                GameManager.Instance.ClearItem();
-                return true;
-
-            case ItemType.Lens:
-                GameManager.Instance.DamagePlayer(1);
-
-                if (!RevealRandomIdentity())
-                    return false;
-
-                GameManager.Instance.ClearItem();
-                return true;
-
-            case ItemType.Hourglass:
-                // Rebuilds same floor number with new puzzle of same difficulty tier.
-                GameManager.Instance.currentPuzzle = generator.Generate(GameManager.Instance.currentFloor, rng);
-                GameManager.Instance.ClearItem();
-                GenerateFloor();
-                return true;
-        }
-
-        return false;
-    }
-
-    private bool RevealRandomIdentity()
-    {
-        if (currentPuzzle == null)
-            return false;
-
-        string[] candidates = new string[currentPuzzle.npcCount];
-
-        for (int i = 0; i < currentPuzzle.npcCount; i++)
-        {
-            if (!currentPuzzle.npcInfo[i].identityRevealedByItem)
-                candidates[i] = npcLabels[i];
-        }
-
-        if (candidates.Length == 0)
-        {
-            Debug.Log("No valid NPC left to reveal.");
-            return false;
-        }
-
-        int randomCandidate = rng.Next(candidates.Length);
-        string chosen = candidates[randomCandidate];
-
-        currentPuzzle.npcInfo[randomCandidate].identityRevealedByItem = true;
-        answerPanelController.RevealIdentity(chosen, currentPuzzle.role[randomCandidate]);
-
-        GameManager.Instance.SaveRun();
-
-        Debug.Log($"Item revealed {currentPuzzle.npcInfo[randomCandidate].label} = {currentPuzzle.role[randomCandidate]}");
-        return true;
     }
 
     private void ClearSpawnedNpcs()
