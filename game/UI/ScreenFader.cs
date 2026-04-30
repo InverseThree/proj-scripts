@@ -1,9 +1,6 @@
 using System.Collections;
 using UnityEngine;
 
-/// <summary>
-/// Put this on a full-screen black UI Image with a CanvasGroup.
-/// </summary>
 public class ScreenFader : MonoBehaviour
 {
     public CanvasGroup canvasGroup;
