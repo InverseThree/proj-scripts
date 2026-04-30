@@ -43,11 +43,6 @@ public class PlayerController : MonoBehaviour
         MovementManagement(h, v);
     }
 
-    void Update()
-    {
-        // AudioManagement();
-    }
-
     void MovementManagement(float horizontal, float vertical)
     {
         if (horizontal != 0f || vertical != 0f)
@@ -69,16 +64,4 @@ public class PlayerController : MonoBehaviour
 
         GetComponent<Rigidbody>().MoveRotation(newRotation);
     }
-
-    // void AudioManagement()
-    // {
-    //     if (anim.GetCurrentAnimatorStateInfo(0).fullPathHash == hash.locomotionState)
-    //     {
-    //         if (!GetComponent<AudioSource>().isPlaying)
-    //             GetComponent<AudioSource>().Play();
-    //     }
-    //     else
-    //         GetComponent<AudioSource>().Stop();
-    //
-    // }
 }
