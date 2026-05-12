@@ -15,25 +15,25 @@ public class FloorManager : MonoBehaviour
     public StatementController statementController;
 
     [Header("Appearance")]
-    public Material[] headMaterials; 
+    public Material[] headMaterials;
     public Material[] bodyMaterials;
 
     [Header("UI")]
     public AnswerPanelController answerPanelController;
     public PopupPanelController popupPanelController;
+    public RewardPanelController rewardPanelController;
+    public HintLogController hintLogController;
+    public ScythePanelController scythePanelController;
+    public LampPanelController lampPanelController;
 
     [Header("Flow")]
     public ScreenFader screenFader;
-    public int finalFloor = 10;
 
     private readonly List<NPCController> spawnedNpcs = new List<NPCController>();
     private System.Random rng = new System.Random();
-
     private PuzzleGenerator generator = new PuzzleGenerator();
 
     private PuzzleData currentPuzzle => GameManager.Instance.currentPuzzle;
-
-    List<int> usedSpawnIndices = new List<int>();
 
     private void OnEnable()
     {
@@ -51,61 +51,57 @@ public class FloorManager : MonoBehaviour
 
         statementController = FindObjectOfType<StatementController>();
         answerPanelController = FindObjectOfType<AnswerPanelController>();
-        screenFader = FindObjectOfType<ScreenFader>();
         popupPanelController = FindObjectOfType<PopupPanelController>();
-
-        npcSpawnPoints = new Transform[6];
+        rewardPanelController = FindObjectOfType<RewardPanelController>();
+        hintLogController = FindObjectOfType<HintLogController>();
+        scythePanelController = FindObjectOfType<ScythePanelController>();
+        lampPanelController = FindObjectOfType<LampPanelController>();
+        screenFader = FindObjectOfType<ScreenFader>();
 
         GameObject[] spawnPoints = GameObject.FindGameObjectsWithTag("spawn");
-
+        npcSpawnPoints = new Transform[spawnPoints.Length];
         for (int i = 0; i < spawnPoints.Length; i++)
-            npcSpawnPoints[i] = spawnPoints[i].GetComponent<Transform>();
+            npcSpawnPoints[i] = spawnPoints[i].transform;
 
         GenerateFloor();
     }
 
     public void GenerateFloor()
     {
-        ClearSpawnedNpcs();
+		ClearSpawnedNpcs();
 
-        if (GameManager.Instance.currentPuzzle == null)
-        {
-            Debug.Log("Generating new puzzle...");
-            GameManager.Instance.currentPuzzle = generator.Generate(GameManager.Instance.currentFloor, rng);
-        }
-        else
-        {
-            Debug.Log("Using existing puzzle...");
-        }
-        PuzzleData puzzle = GameManager.Instance.currentPuzzle;
-       
-        if (puzzle.npcInfo == null || puzzle.role == null)
-        {
-            Debug.Log("Loaded puzzle incomplete - regenerating...");
-            GameManager.Instance.currentPuzzle = generator.Generate(GameManager.Instance.currentFloor, rng);
-            puzzle = GameManager.Instance.currentPuzzle;
-        }
+		GameManager.Instance.currentPuzzle = generator.Generate(GameManager.Instance.currentFloor, rng, false, null);
+		PuzzleData puzzle = GameManager.Instance.currentPuzzle;
+		DistributeAppearances(puzzle);
+		SpawnNPCs(puzzle);
+		ApplyAppearances(puzzle);
+		InitializeFloor(puzzle);
 
-        InitializeFloor(puzzle);
-        DistributeAppearances(puzzle);
-        SpawnNPCs(puzzle);
-        ApplyAppearances(puzzle);
+		ModifyDisplayText(puzzle);
+		hintLogController.BuildFromPuzzle(puzzle);
+
+		if (GameManager.Instance.modifierState.shardActive && !currentPuzzle.floorState.shardResolved && !GameManager.Instance.rewinded) 
+			StartCoroutine(ShardActivate());
+
+		GameManager.Instance.rewinded = false;
+
+        GameManager.Instance.SaveRun();
     }
 
     private void InitializeFloor(PuzzleData puzzle)
     {
-        if (puzzle.npcInfo == null || puzzle.role == null)
-        {
-            Debug.LogError("Puzzle arrays are missing.");
-            return;
-        }
-
         if (puzzle.playerGuesses == null || puzzle.playerGuesses.Length != puzzle.npcCount)
         {
             puzzle.playerGuesses = new int[puzzle.npcCount];
-            for (int i = 0; i < puzzle.playerGuesses.Length; i++)
+            for (int i = 0; i < puzzle.npcCount; i++)
                 puzzle.playerGuesses[i] = 0;
         }
+
+        if (puzzle.floorState == null)
+            puzzle.floorState = new PuzzleData.FloorSpecialState();
+
+        if (puzzle.hints == null)
+            puzzle.hints = new List<string>();
 
         for (int i = 0; i < puzzle.npcCount; i++)
         {
@@ -125,36 +121,35 @@ public class FloorManager : MonoBehaviour
             return;
         }
 
+		int[] index = new int[puzzle.npcCount];
+
         List<Transform> availableSpawns = new List<Transform>(npcSpawnPoints);
 
         for (int i = 0; i < puzzle.npcCount; i++)
         {
-            int index = rng.Next(0, availableSpawns.Count);
-            Transform spawn = availableSpawns[index];
+			Transform spawn;
+
+            index[i] = rng.Next(0, availableSpawns.Count);
+
+			if (!GameManager.Instance.currentPuzzle.floorState.scytheUsed)
+			{
+				GameManager.Instance.npcSpawnedIndices.Add(index[i]);
+				spawn = availableSpawns[index[i]];
+			}
+			else
+				spawn = availableSpawns[GameManager.Instance.npcSpawnedIndices[i]];
 
             GameObject npc = Instantiate(npcPrefab, spawn.position, spawn.rotation);
+			Debug.Log($"Npc{i}");
 
             NPCController controller = npc.GetComponent<NPCController>();
+
             controller.Setup(this, i, puzzle, statementController);
 
-            availableSpawns.RemoveAt(index);
+            availableSpawns.RemoveAt(GameManager.Instance.currentPuzzle.floorState.scytheUsed ? GameManager.Instance.npcSpawnedIndices[i] : index[i]);
             spawnedNpcs.Add(controller);
         }
-    }
 
-    private Transform GetRandomSpawnPoint()
-    {
-        List<int> available = new List<int>();
-        for (int i = 0; i < npcSpawnPoints.Length; i++)
-            if (!usedSpawnIndices.Contains(i))
-                available.Add(i);
-
-        if (available.Count == 0)
-            available.Add(rng.Next(0, npcSpawnPoints.Length));
-
-        int chosen = available[rng.Next(0, available.Count)];
-        usedSpawnIndices.Add(chosen);
-        return npcSpawnPoints[chosen];
     }
 
     private void DistributeAppearances(PuzzleData puzzle)
@@ -183,6 +178,7 @@ public class FloorManager : MonoBehaviour
             }
         }
 
+        // Shuffle combinations
         for (int i = 0; i < combos.Count; i++)
         {
             int j = rng.Next(i, combos.Count);
@@ -216,8 +212,7 @@ public class FloorManager : MonoBehaviour
 
             Debug.Log($"NPC {i} materials - head: {headIndex}, body: {bodyIndex}");
 
-            if (headIndex < 0 || headIndex >= headMaterials.Length ||
-                bodyIndex < 0 || bodyIndex >= bodyMaterials.Length)
+            if (headIndex < 0 || headIndex >= headMaterials.Length || bodyIndex < 0 || bodyIndex >= bodyMaterials.Length)
             {
                 Debug.LogWarning($"Invalid material index on NPC {i}");
                 continue;
@@ -227,16 +222,91 @@ public class FloorManager : MonoBehaviour
         }
     }
 
+    private void ModifyDisplayText(PuzzleData puzzle)
+    {
+        if (GameManager.Instance.modifierState.lampActive && puzzle.floorState.lampHiddenIndex < 0)
+        {
+            List<int> candidates = new List<int>();
+            for (int i = 0; i < puzzle.npcCount; i++)
+            {
+                if (puzzle.npcInfo[i].statement.GetReferencedIndices(i).Count > 0)
+                    candidates.Add(i);
+            }
+
+            if (candidates.Count > 0)
+                puzzle.floorState.lampHiddenIndex = candidates[rng.Next(candidates.Count)];
+        }
+
+        for (int i = 0; i < puzzle.npcCount; i++)
+        {
+            string[] names = (string[])npcLabels.Clone();
+
+            if (GameManager.Instance.modifierState.lampActive && puzzle.floorState.lampHiddenIndex == i)
+            {
+                List<int> refs = puzzle.npcInfo[i].statement.GetReferencedIndices(i);
+                for (int r = 0; r < refs.Count; r++)
+                    names[refs[r]] = "?";
+            }
+
+            puzzle.npcInfo[i].statementText = puzzle.npcInfo[i].statement.ToText(names, i);
+        }
+
+        if (GameManager.Instance.modifierState.mirrorPending && puzzle.floorState.mirrorHintA < 0)
+        {
+            List<(int, int)> samePairs = new List<(int, int)>();
+
+            for (int i = 0; i < puzzle.npcCount; i++)
+            {
+                for (int j = i + 1; j < puzzle.npcCount; j++)
+                {
+                    if (puzzle.role[i] == puzzle.role[j])
+                        samePairs.Add((i, j));
+                }
+            }
+
+            if (samePairs.Count > 0)
+            {
+                var pair = samePairs[rng.Next(samePairs.Count)];
+                puzzle.floorState.mirrorHintA = pair.Item1;
+                puzzle.floorState.mirrorHintB = pair.Item2;
+
+                AddHint($"Mirror of Truth: {puzzle.npcInfo[pair.Item1].label} and {puzzle.npcInfo[pair.Item2].label} have the same identity.");
+            }
+			else
+                AddHint("Mirror of Truth: None of the inhabitants on this floor have the same identity.");
+
+            GameManager.Instance.modifierState.mirrorPending = false;
+        }
+    }
+
+    private IEnumerator ShardActivate()
+    {
+		yield return null;
+
+		List<ItemType> items = GetItemChoice(3, excludeMirrorOnFinalFloor: GameManager.Instance.currentFloor >= GameManager.Instance.GetFinalFloor());
+
+		bool done = false;
+		rewardPanelController.ShowItemChoice(items, GameManager.Instance.heldItem != ItemType.None, selected =>
+			{
+				if (selected != ItemType.None)
+				    GameManager.Instance.GiveItem(selected);
+
+				currentPuzzle.floorState.shardResolved = true;
+				GameManager.Instance.SaveRun();
+				done = true;
+			});
+
+		yield return new WaitUntil(() => done);
+    }
+
     public void RevealStatement(int npcIndex)
     {
         if (currentPuzzle == null)
-            return;
-
+			return;
         if (npcIndex < 0 || npcIndex >= currentPuzzle.npcCount)
-            return;
-
+			return;
         if (currentPuzzle.npcInfo[npcIndex].discovered)
-            return;
+			return;
 
         currentPuzzle.npcInfo[npcIndex].discovered = true;
         answerPanelController.SetStatement(npcIndex, currentPuzzle.npcInfo[npcIndex].statementText);
@@ -252,104 +322,432 @@ public class FloorManager : MonoBehaviour
         currentPuzzle.playerGuesses = answerPanelController.GetGuesses();
         GameManager.Instance.SaveRun();
 
-        var solutions = PuzzleValidator.FindSolutions(currentPuzzle);
-        Debug.Log($"Total solutions: {solutions.Count}");
-        for (int s = 0; s < solutions.Count; s++)
-        {
-            string sol = "";
-            for (int i = 0; i < solutions[s].Length; i++)
-                sol += $"{currentPuzzle.npcInfo[i].label}={solutions[s][i]} ";
-            Debug.Log($"Solution {s}: {sol}");
-        }
-
-        for (int i = 0; i < currentPuzzle.npcCount; i++)
-        {
-            string label = currentPuzzle.npcInfo[i].label;
-            int guess = currentPuzzle.playerGuesses[i];
-            int answer = (int)currentPuzzle.role[i];
-            bool match = (guess == answer);
-            Debug.Log($"{label}: guess={guess} ({Enum.GetName(typeof(Role), guess)}), answer={answer} ({Enum.GetName(typeof(Role), answer)}), match={match}");
-        }
-
-        Debug.Log("Current puzzle role array:");
-        for (int i = 0; i < currentPuzzle.npcCount; i++)
-        {
-            Debug.Log($"  Index {i}: {currentPuzzle.role[i]} ({(Role)currentPuzzle.role[i]})");
-        }
-        Debug.Log("Player guesses array:");
-        for (int i = 0; i < currentPuzzle.npcCount; i++)
-        {
-            int guess = currentPuzzle.playerGuesses[i];
-            Debug.Log($"  Index {i}: {guess} ({(Role)guess})");
-        }
-
-        bool allCorrect = true;
-
+        int wrongCount = 0;
         for (int i = 0; i < currentPuzzle.npcCount; i++)
         {
             if (currentPuzzle.playerGuesses[i] != (int)currentPuzzle.role[i])
-            {
-                allCorrect = false;
-                break;
-            }
+                wrongCount++;
         }
 
-        if (allCorrect)
-            popupPanelController.ShowAnswerCorrect();
-        else
-            StartCoroutine(WrongSubmission());
+        if (wrongCount == 0)
+        {
+			if (GameManager.Instance.currentFloor == GameManager.Instance.GetFinalFloor())
+			{
+				popupPanelController.ShowGameClear();
+				return;
+			}
+			else
+			{
+				popupPanelController.ShowAnswerCorrect();
+				return;
+			}
+        }
+
+        int damage = GameManager.Instance.GetDamageAmount(wrongCount);
+        StartCoroutine(WrongSubmission(damage));
     }
 
-    private IEnumerator WrongSubmission()
+    private IEnumerator WrongSubmission(int damage)
     {
-        bool dead = GameManager.Instance.DamagePlayer(1);
+        bool dead = GameManager.Instance.TryTakeDamage(damage, out _, out _);
 
         if (dead)
         {
             RevealSolution();
-
-            Debug.Log("Game Over - reveal current floor solution.");
-
             popupPanelController.ShowGameOver();
         }
 
         yield return null;
     }
 
-    public IEnumerator FloorCleared(bool cleared)
+    public IEnumerator ResolveFloorClear()
     {
-        if (screenFader != null)
-            yield return screenFader.FadeOut(0.35f);
+        int clearedFloor = GameManager.Instance.currentFloor;
 
-        DropItem();
-
-        if (GameManager.Instance.currentFloor >= finalFloor)
+        if (clearedFloor == 5 && GameManager.Instance.heldRelic == RelicType.None)
         {
-            Debug.Log("Victory!");
+            bool relicDone = false;
 
-            popupPanelController.ShowGameClear();
+			popupPanelController.gameObject.SetActive(false);
+            rewardPanelController.ShowRelicChoice(GetRelicChoice(3), relic =>
+            {
+                if (relic != RelicType.None)
+                    GameManager.Instance.GiveRelic(relic);
+
+                relicDone = true;
+            });
+
+            yield return new WaitUntil(() => relicDone);
         }
-        else
+
+        if (clearedFloor == 3 || clearedFloor == 6 || clearedFloor == 9)
         {
-            if (cleared)
-                GameManager.Instance.AdvanceFloor();
+            ItemType rewardItem = GetRandomItem();
 
-            string currentSceneName = SceneManager.GetActiveScene().name;
-            SceneManager.LoadScene(currentSceneName);
+            bool itemDone = false;
 
-            if (screenFader != null)
-                yield return screenFader.FadeIn(0.35f);
+			popupPanelController.gameObject.SetActive(false);
+            rewardPanelController.ShowItemOffer(rewardItem, !GameManager.Instance.modifierState.itemSlotDisabled, GameManager.Instance.heldItem != ItemType.None, decision =>
+                {
+                    if (decision == ItemOptions.Take)
+                    {
+                        GameManager.Instance.GiveItem(rewardItem);
+                    }
+                    else if (decision == ItemOptions.TakeAndUse)
+                    {
+                        GameManager.Instance.GiveItem(rewardItem);
+                        TryUseHeldItem();
+                    }
+
+                    itemDone = true;
+                });
+
+            yield return new WaitUntil(() => itemDone);
+        }
+
+        GameManager.Instance.AdvanceFloor();
+		StartCoroutine(LoadFloor());
+    }
+
+    public void OnItemSlotClicked()
+    {
+        if (GameManager.Instance.heldItem == ItemType.None)
+            return;
+
+        rewardPanelController.ShowUseItemPrompt(GameManager.Instance.heldItem, confirmed =>
+            {
+                if (confirmed)
+                    TryUseHeldItem();
+            });
+    }
+
+    public void OnRelicSlotClicked()
+    {
+        switch (GameManager.Instance.heldRelic)
+        {
+            case RelicType.Scythe:
+                if (currentPuzzle.floorState.scytheUsed)
+                {
+                    rewardPanelController.ShowMessage("Scythe of Origination", "This relic has already been used on this floor.");
+                    return;
+                }
+
+                scythePanelController.Show(currentPuzzle.npcCount, npcLabels, selected =>
+                    {
+                        if (selected.Count == 0)
+						    return;
+
+                        bool success = generator.RerollSelected(currentPuzzle, selected, rng);
+                        if (success)
+                        {
+						    for (int i = 0; i < currentPuzzle.npcCount; i++)
+						    {
+						        Debug.Log($"POST-REROLL ROLE {i}: {currentPuzzle.role[i]}");
+						    }
+						    currentPuzzle.floorState.scytheUsed = true;
+
+						    currentPuzzle.hints.Clear();
+						    currentPuzzle.floorState.ClearDerivedFloorHints();
+
+						    ClearSpawnedNpcs();
+
+						    SpawnNPCs(currentPuzzle);
+						    DistributeAppearances(currentPuzzle);
+						    ApplyAppearances(currentPuzzle);
+
+						    ModifyDisplayText(currentPuzzle);
+
+						    answerPanelController.BuildFromPuzzle(GameManager.Instance.currentPuzzle);
+						    hintLogController.BuildFromPuzzle(GameManager.Instance.currentPuzzle);
+
+						    GameManager.Instance.SaveRun();
+						}
+                    });
+                break;
+
+            case RelicType.Lamp:
+                lampPanelController.Show(currentPuzzle.npcCount, npcLabels, GameManager.Instance.modifierState, request =>
+                    {
+                        MakeWish(request);
+                    });
+                break;
+
+            default:
+                rewardPanelController.ShowMessage(RewardTextLibrary.GetRelicName(GameManager.Instance.heldRelic), "This relic has no active ability.");
+                break;
         }
     }
+
+    public bool TryUseHeldItem()
+    {
+        switch (GameManager.Instance.heldItem)
+        {
+            case ItemType.None:
+                return false;
+
+            case ItemType.Tonic:
+                if (!GameManager.Instance.HealPlayer(1))
+                    return false;
+
+                GameManager.Instance.ClearItem();
+                return true;
+
+            case ItemType.Shield:
+                currentPuzzle.floorState.shieldActive = true;
+                GameManager.Instance.ClearItem();
+                GameManager.Instance.SaveRun();
+                return true;
+
+            case ItemType.Lens:
+                GameManager.Instance.TryTakeDamage(1, out _, out _);
+                RevealRandomIdentity();
+                GameManager.Instance.ClearItem();
+                return true;
+
+            case ItemType.Scroll:
+                RevealRandomCount();
+                GameManager.Instance.ClearItem();
+                return true;
+
+            case ItemType.Mirror:
+                GameManager.Instance.modifierState.mirrorPending = true;
+                GameManager.Instance.ClearItem();
+                GameManager.Instance.SaveRun();
+                return true;
+
+            case ItemType.Hourglass:
+                StartCoroutine(Rewind());
+                GameManager.Instance.ClearItem();
+                return true;
+        }
+
+        return false;
+    }
+
+    private void RevealRandomIdentity()
+    {
+        List<int> candidates = new List<int>();
+
+        for (int i = 0; i < currentPuzzle.npcCount; i++)
+        {
+            if (!currentPuzzle.npcInfo[i].identityRevealed)
+                candidates.Add(i);
+        }
+
+        if (candidates.Count == 0)
+        {
+            rewardPanelController.ShowMessage("Lens of Devil", "No valid inhabitant is left to reveal.");
+            return;
+        }
+
+        int pickedIndex = candidates[rng.Next(candidates.Count)];
+        currentPuzzle.npcInfo[pickedIndex].identityRevealed = true;
+        answerPanelController.RevealIdentity(currentPuzzle.npcInfo[pickedIndex].label, currentPuzzle.role[pickedIndex]);
+        AddHint($"Lens of Devil: {currentPuzzle.npcInfo[pickedIndex].label} is a {currentPuzzle.role[pickedIndex].ToString().ToLower()}.");
+        GameManager.Instance.SaveRun();
+    }
+
+    private void RevealRandomCount()
+    {
+        int knightCount = 0;
+        int knaveCount = 0;
+
+        for (int i = 0; i < currentPuzzle.npcCount; i++)
+        {
+            if (currentPuzzle.role[i] == Role.Knight) knightCount++;
+            if (currentPuzzle.role[i] == Role.Knave) knaveCount++;
+        }
+
+        bool revealKnights = rng.NextDouble() < 0.5;
+        currentPuzzle.floorState.scrollViewed = true;
+        currentPuzzle.floorState.scrollRevealRole = revealKnights;
+        currentPuzzle.floorState.scrollRevealNumber = revealKnights ? knightCount : knaveCount;
+
+        AddHint($"Scroll of Insight: There are either {currentPuzzle.floorState.scrollRevealNumber} knights or {currentPuzzle.floorState.scrollRevealNumber} knaves on this floor.");
+        GameManager.Instance.SaveRun();
+    }
+
+    private IEnumerator Rewind()
+    {
+        GameManager.Instance.modifierState.lampTotalUsed -= currentPuzzle.floorState.lampWishesSpent;
+        GameManager.Instance.modifierState.lampIdentityTotalUsed -= currentPuzzle.floorState.lampIdentitySpent;
+        GameManager.Instance.modifierState.lampPairTotalUsed -= currentPuzzle.floorState.lampPairSpent;
+        GameManager.Instance.modifierState.lampCountTotalUsed -= currentPuzzle.floorState.lampCountSpent;
+
+        GameManager.Instance.modifierState.lampTotalUsed = Mathf.Max(0, GameManager.Instance.modifierState.lampTotalUsed);
+        GameManager.Instance.modifierState.lampIdentityTotalUsed = Mathf.Max(0, GameManager.Instance.modifierState.lampIdentityTotalUsed);
+        GameManager.Instance.modifierState.lampPairTotalUsed = Mathf.Max(0, GameManager.Instance.modifierState.lampPairTotalUsed);
+        GameManager.Instance.modifierState.lampCountTotalUsed = Mathf.Max(0, GameManager.Instance.modifierState.lampCountTotalUsed);
+
+        bool mirrorUsed = currentPuzzle.floorState.mirrorHintA >= 0 && currentPuzzle.floorState.mirrorHintB >= 0;
+
+        if (mirrorUsed)
+            GameManager.Instance.modifierState.mirrorPending = true;
+		bool retakeDamage = false;
+		if (currentPuzzle.floorState.talismanPrevented == true)
+			retakeDamage = true;
+
+		GameManager.Instance.rewinded = true;
+		GameManager.Instance.SaveRun();
+
+		yield return StartCoroutine(LoadFloor());
+
+        answerPanelController.BuildFromPuzzle(GameManager.Instance.currentPuzzle);
+
+		if (retakeDamage)
+		{
+			currentPuzzle.floorState.talismanPrevented = false;
+			GameManager.Instance.TryTakeDamage(1, out _, out _);
+		}
+    }
+
+    private void MakeWish(LampPanelController.LampWishRequest request)
+    {
+        RunModifierState mods = GameManager.Instance.modifierState;
+        PuzzleData.FloorSpecialState state = currentPuzzle.floorState;
+
+        if (mods.lampTotalUsed >= 3)
+        {
+            rewardPanelController.ShowMessage("Lamp of Oracle", "No wishes remain.");
+            return;
+        }
+
+        switch (request.type)
+        {
+            case LampWishType.Identity:
+                if (mods.lampIdentityTotalUsed >= 1)
+                    return;
+
+                mods.lampTotalUsed++;
+                mods.lampIdentityTotalUsed++;
+                state.lampWishesSpent++;
+                state.lampIdentitySpent++;
+                state.lampIdentityIndex = request.a;
+
+                currentPuzzle.npcInfo[request.a].identityRevealed = true;
+                answerPanelController.RevealIdentity(currentPuzzle.npcInfo[request.a].label, currentPuzzle.role[request.a]);
+                AddHint($"Lamp of Oracle: {currentPuzzle.npcInfo[request.a].label} is a {currentPuzzle.role[request.a].ToString().ToLower()}.");
+                break;
+
+            case LampWishType.Pair:
+                if (mods.lampPairTotalUsed >= 2)
+                    return;
+
+                mods.lampTotalUsed++;
+                mods.lampPairTotalUsed++;
+                state.lampWishesSpent++;
+                state.lampPairSpent++;
+
+                bool same = currentPuzzle.role[request.a] == currentPuzzle.role[request.b];
+                state.lampPairHints.Add(new PuzzleData.LampPairHint { a = request.a, b = request.b, same = same });
+
+                AddHint($"Lamp of Oracle: {currentPuzzle.npcInfo[request.a].label} and {currentPuzzle.npcInfo[request.b].label} {(same ? "have" : "do not have")} the same identity.");
+                break;
+
+            case LampWishType.Counts:
+                if (mods.lampCountTotalUsed >= 3)
+                    return;
+
+                mods.lampTotalUsed++;
+                mods.lampCountTotalUsed++;
+                state.lampWishesSpent++;
+                state.lampCountSpent++;
+
+                int knightCount = 0;
+                int knaveCount = 0;
+                for (int i = 0; i < currentPuzzle.npcCount; i++)
+                {
+                    if (currentPuzzle.role[i] == Role.Knight)
+						knightCount++;
+					else if (currentPuzzle.role[i] == Role.Knave)
+						knaveCount++;
+                }
+
+                state.lampCountGranted = true;
+                state.lampKnightCount = knightCount;
+                state.lampKnaveCount = knaveCount;
+
+                AddHint($"Lamp of Oracle: There are {knightCount} knights and {knaveCount} knaves on this floor.");
+                break;
+        }
+
+        GameManager.Instance.SaveRun();
+    }
+
+    private void AddHint(string text)
+    {
+        if (currentPuzzle.hints == null)
+            currentPuzzle.hints = new List<string>();
+
+        currentPuzzle.hints.Add(text);
+        hintLogController.BuildFromPuzzle(currentPuzzle);
+    }
+
+    private ItemType GetRandomItem()
+    {
+        List<ItemType> pool = new List<ItemType>
+        {
+            ItemType.Tonic,
+            ItemType.Shield,
+            ItemType.Lens,
+            ItemType.Scroll,
+            ItemType.Mirror,
+            ItemType.Hourglass
+        };
+
+        return pool[rng.Next(pool.Count)];
+    }
+
+    private List<ItemType> GetItemChoice(int count, bool excludeMirrorOnFinalFloor)
+    {
+        List<ItemType> pool = new List<ItemType>
+        {
+            ItemType.Tonic,
+            ItemType.Shield,
+            ItemType.Lens,
+            ItemType.Scroll,
+            ItemType.Mirror,
+            ItemType.Hourglass
+        };
+
+        if (excludeMirrorOnFinalFloor)
+            pool.Remove(ItemType.Mirror);
+
+		return AddReward<ItemType>(pool, count);
+    }
+
+    private List<RelicType> GetRelicChoice(int count)
+    {
+        List<RelicType> pool = new List<RelicType>
+        {
+            RelicType.Coin,
+            RelicType.Brush,
+            RelicType.Talisman,
+            RelicType.Shard,
+            RelicType.Scythe,
+            RelicType.Lamp
+        };
+
+		return AddReward<RelicType>(pool, count);
+    }
+
+	private List<T> AddReward<T>(List<T> pool, int count)
+	{
+		List<T> list = new List<T>();
+
+		while (list.Count < count && pool.Count > 0)
+		{
+			int idx = rng.Next(pool.Count);
+			list.Add(pool[idx]);
+			pool.RemoveAt(idx);
+		}
+
+		return list;
+	}
 
     private void RevealSolution()
     {
         answerPanelController.RevealAll(currentPuzzle.role);
-
-        for (int i = 0; i < currentPuzzle.npcCount; i++)
-        {
-            Debug.Log($"{currentPuzzle.npcInfo[i].label} = {currentPuzzle.role[i]}");
-        }
     }
 
     private void ClearSpawnedNpcs()
@@ -372,4 +770,12 @@ public class FloorManager : MonoBehaviour
     {
         return GameManager.Instance.currentFloor;
     }
+
+	private IEnumerator LoadFloor()
+	{
+        if (screenFader != null)
+            yield return screenFader.FadeOut(0.35f);
+
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+	}
 }

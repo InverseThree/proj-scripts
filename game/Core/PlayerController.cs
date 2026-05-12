@@ -12,6 +12,9 @@ public class PlayerController : MonoBehaviour
     private Animator anim;              
     private GameObject table;              
     private GameObject popup;
+    private GameObject reward;
+    private GameObject scythe;
+    private GameObject lamp;
     private Toggle expander;              
     private HashIDs hash;              
 
@@ -23,13 +26,16 @@ public class PlayerController : MonoBehaviour
         anim = GetComponent<Animator>();
         table = GameObject.FindGameObjectWithTag("truthTable");
         popup = GameObject.FindGameObjectWithTag("popup");
+        reward = FindObjectOfType<RewardPanelController>().gameObject.transform.Find("rewardPanel").gameObject;
+        scythe = FindObjectOfType<ScythePanelController>().gameObject;
+        lamp = FindObjectOfType<LampPanelController>().gameObject;
         expander = GameObject.FindGameObjectWithTag("toggle").GetComponent<Toggle>();
         hash = GameObject.FindGameObjectWithTag("GameController").GetComponent<HashIDs>();
     }
 
     void FixedUpdate()
     {
-        if (!SayDialog.GetSayDialog().isActiveAndEnabled && !MenuDialog.GetMenuDialog().isActiveAndEnabled && !table.activeSelf && !popup.activeSelf && !expander.isOn)
+        if (!SayDialog.GetSayDialog().isActiveAndEnabled && !MenuDialog.GetMenuDialog().isActiveAndEnabled && !table.activeSelf && !popup.activeSelf && !reward.activeSelf && !scythe.activeSelf && !lamp.activeSelf && !expander.isOn)
         {
             h = Input.GetAxis("Horizontal");
             v = Input.GetAxis("Vertical");
@@ -41,6 +47,11 @@ public class PlayerController : MonoBehaviour
         }
 
         MovementManagement(h, v);
+    }
+
+    void Update()
+    {
+        // AudioManagement();
     }
 
     void MovementManagement(float horizontal, float vertical)
@@ -64,4 +75,16 @@ public class PlayerController : MonoBehaviour
 
         GetComponent<Rigidbody>().MoveRotation(newRotation);
     }
+
+    // void AudioManagement()
+    // {
+    //     if (anim.GetCurrentAnimatorStateInfo(0).fullPathHash == hash.locomotionState)
+    //     {
+    //         if (!GetComponent<AudioSource>().isPlaying)
+    //             GetComponent<AudioSource>().Play();
+    //     }
+    //     else
+    //         GetComponent<AudioSource>().Stop();
+    //
+    // }
 }

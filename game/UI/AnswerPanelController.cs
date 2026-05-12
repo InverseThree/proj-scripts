@@ -7,18 +7,18 @@ using TMPro;
 
 public class AnswerPanelController : MonoBehaviour
 {
-    private GameObject statementSet;
+    public GameObject statementSet;
     private GameObject rowsContainer;
-    private GameObject popup;
-    private Button submitButton;
-    private Toggle toggle;
+    public GameObject popup;
+    public Button submitButton;
+    public Toggle toggle;
     private TextMeshProUGUI statement;
 
     private GameObject[] npc;
     private TMP_Dropdown[] answer;
     private int[] guess;
 
-    private FloorManager floorManager;
+    public FloorManager floorManager;
 
     private int npcCount;
     private string[] npcLabels = FloorManager.npcLabels;
@@ -69,6 +69,9 @@ public class AnswerPanelController : MonoBehaviour
             npc[i] = rowsContainer.transform.Find(npcLabels[i]).gameObject;
             answer[i] = npc[i].transform.Find("answer").gameObject.GetComponent<TMP_Dropdown>();
             answer[i].onValueChanged.AddListener(delegate{ SetSubmitButton(); });
+
+            if (GameManager.Instance.currentPuzzle.PeasantEnabled())
+                answer[i].AddOptions(new List<string>{ "Peasant" });
         }
 
         submitButton.onClick.AddListener(floorManager.SubmitAnswers);
@@ -129,5 +132,22 @@ public class AnswerPanelController : MonoBehaviour
                 answer[i].interactable = false;
             }
         }
+    }
+
+    public void BuildFromPuzzle(PuzzleData puzzle)
+    {
+        for (int i = 0; i < puzzle.npcCount; i++)
+        {
+            string text = puzzle.npcInfo[i].discovered ? puzzle.npcInfo[i].statementText : "???";
+            SetStatement(i, text);
+
+            answer[i].value = puzzle.playerGuesses[i];
+            answer[i].interactable = !puzzle.npcInfo[i].identityRevealed;
+
+            if (puzzle.npcInfo[i].identityRevealed)
+                answer[i].value = (int)puzzle.role[i];
+        }
+
+        SetSubmitButton();
     }
 }

@@ -7,8 +7,8 @@ public class NPCController: MonoBehaviour
 
     private FloorManager floorManager;
     private int npcIndex;
-    private string npcName;
-    private string statementText;
+    public string npcName;
+    public string statementText;
     private StatementController statementController;
 
     public string Label => npcName;
@@ -36,7 +36,7 @@ public class NPCController: MonoBehaviour
     {
         statementController.ShowName(npcName);
     }
-    
+
     public void OnDialogueFinished()
     {
         floorManager?.RevealStatement(npcIndex);

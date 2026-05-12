@@ -58,6 +58,7 @@ public static class PuzzleValidator
                     break;
 
                 case Role.Peasant:
+                    // unrestricted
                     break;
             }
         }

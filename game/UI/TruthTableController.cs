@@ -1,10 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using Fungus;
 
 public class TruthTableController : MonoBehaviour
 {
+    public Button truthTableButton;
+
     private GameObject table;
     private GameObject layout;
     private GameObject popup;
@@ -16,6 +19,8 @@ public class TruthTableController : MonoBehaviour
     private void Awake()
     {
         popup = GameObject.FindGameObjectWithTag("popup");
+
+        truthTableButton.onClick.AddListener(SetTable);
     }
 
     private void Start()
@@ -49,8 +54,17 @@ public class TruthTableController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.T) && !table.activeSelf && !popup.activeSelf && !SayDialog.GetSayDialog().isActiveAndEnabled && !MenuDialog.GetMenuDialog().isActiveAndEnabled && npcCount < 5)
             table.SetActive(true);
-
-        if (Input.GetKeyDown(KeyCode.Escape) && table.activeSelf)
+        else if (Input.GetKeyDown(KeyCode.T) && table.activeSelf)
             table.SetActive(false);
+
+        if (SayDialog.GetSayDialog().isActiveAndEnabled || MenuDialog.GetMenuDialog().isActiveAndEnabled || npcCount > 4)
+            truthTableButton.interactable = false;
+        else
+            truthTableButton.interactable = true;
+    }
+
+    private void SetTable()
+    {
+        table.SetActive(!table.activeSelf);
     }
 }

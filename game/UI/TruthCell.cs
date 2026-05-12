@@ -1,16 +1,16 @@
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-
-public enum TriValue
-{
-    Empty,
-    True,
-    False
-}
+using TMPro;
 
 public class TruthCell : MonoBehaviour
 {
+    private enum TriValue
+    {
+        Empty,
+        True,
+        False
+    }
+
     [SerializeField] private TextMeshProUGUI label;
     [SerializeField] private Image background;
 
@@ -20,9 +20,9 @@ public class TruthCell : MonoBehaviour
     [SerializeField] private Color wrongColor = new Color(1f, 0.7f, 0.7f);
     [SerializeField] private Color incompleteColor = new Color(1f, 1f, 0.6f);
 
-    public TriValue Value { get; private set; } = TriValue.Empty;
+    private TriValue Value { get; set; } = TriValue.Empty;
 
-    public void OnClick()
+    private void OnClick()
     {
         Value = Value switch
         {
@@ -34,31 +34,31 @@ public class TruthCell : MonoBehaviour
         Refresh();
     }
 
-    public void SetState(TriValue newValue)
+    private void SetState(TriValue newValue)
     {
         Value = newValue;
         Refresh();
     }
 
-    public void ResetVisual()
+    private void ResetVisual()
     {
         if (background != null)
             background.color = normalColor;
     }
 
-    public void MarkCorrect(bool isCorrect)
+    private void MarkCorrect(bool isCorrect)
     {
         if (background != null)
             background.color = isCorrect ? correctColor : wrongColor;
     }
 
-    public void MarkIncomplete()
+    private void MarkIncomplete()
     {
         if (background != null)
             background.color = incompleteColor;
     }
 
-    public bool? AsNullableBool()
+    private bool? AsNullableBool()
     {
         return Value switch
         {

@@ -2,94 +2,187 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+public struct StatementKey : System.IEquatable<StatementKey>
+{
+    public StatementList type;
+    public int variant;
+
+    public StatementKey(StatementList type, int variant)
+    {
+        this.type = type;
+        this.variant = variant;
+    }
+
+    public bool Equals(StatementKey other)
+    {
+        return type == other.type && variant == other.variant;
+    }
+
+    public override int GetHashCode()
+    {
+        return ((int)type * 397) ^ variant;
+    }
+}
+
 public class PuzzleGenerator
 {
     private string[] npcLabels = FloorManager.npcLabels;
 
     private int npcCount;
-    
-    HashSet<StatementList> usedStatementTypes = new HashSet<StatementList>();
 
-    public PuzzleData Generate(int floorIndex, System.Random rng)
+    private PuzzleData lastPuzzle;
+
+    HashSet<StatementKey> usedStatementVariants = new();
+
+    public PuzzleData Generate(int floorIndex, System.Random rng, bool scytheUsed, List<int> selectedIndices)
     {
-        npcCount = floorIndex <= 3 ? 2 : floorIndex <= 6 ? 3 : floorIndex <= 9 ? 4 : 5;
+        RunModifierState mods = GameManager.Instance.modifierState;
+
+        if (mods.brushActive)
+            npcCount = floorIndex <= 6 ? rng.Next(2, 4) : floorIndex <= 9 ? rng.Next(2, 5) : rng.Next(2, 6);
+        else
+            npcCount = floorIndex <= 3 ? 2 : floorIndex <= 6 ? 3 : floorIndex <= 9 ? 4 : 5;
+
+        if (mods.coinActive)
+            npcCount += 1;
+
         bool peasantRequired = floorIndex >= 10;
 
-        var puzzle = new PuzzleData
+        PuzzleData puzzle = new PuzzleData
         {
             floorIndex = floorIndex,
             npcCount = npcCount,
             peasantRequired = peasantRequired,
             npcInfo = new PuzzleData.NPCInfo[npcCount],
             role = new Role[npcCount],
-            playerGuesses = new int[npcCount]
+            playerGuesses = new int[npcCount],
+            floorState = new PuzzleData.FloorSpecialState(),
+            hints = new List<string>()
         };
 
         for (int i = 0; i < npcCount; i++)
             puzzle.playerGuesses[i] = 0;
 
-        for (int attempt = 0; attempt < 1000; attempt++)
+        for (int attempt = 0; attempt < 10000; attempt++)
         {
-            usedStatementTypes.Clear();
-
             do
             {
-                GenerateSolutions(puzzle, rng);
+                GenerateSolutions(puzzle, rng, scytheUsed, selectedIndices);
                 GenerateStatements(puzzle, floorIndex, rng);
+
+                for (int i = 0; i < puzzle.role.Length; i++)
+                {
+                    if (puzzle.role[i] == Role.None)
+                    {
+                        puzzle.role[i] = lastPuzzle.role[i];
+                        puzzle.npcInfo[i] = lastPuzzle.npcInfo[i];
+                    }
+                }
+
+                if (puzzle.peasantRequired && !Array.Exists(puzzle.role, r => r == Role.Peasant))
+                    puzzle.role[rng.Next(puzzle.npcCount)] = Role.Peasant;
             } while (!PuzzleValidator.CheckValid(puzzle, puzzle.role));
 
-            var solutions = PuzzleValidator.FindSolutions(puzzle);
+            List<Role[]> solutions = PuzzleValidator.FindSolutions(puzzle);
             Debug.Log($"Attempt {attempt}: solutions = {solutions.Count}");
 
             if (solutions.Count == 1)
+            {
+                for (int i = 0; i < npcCount; i++)
+                {
+                    if (!scytheUsed || selectedIndices.Contains(i))
+                    {
+                        puzzle.npcInfo[i].label = npcLabels[i]; 
+                        puzzle.npcInfo[i].statementText = puzzle.npcInfo[i].statement.ToText(npcLabels, i);
+                        puzzle.npcInfo[i].discovered = false;
+                        puzzle.npcInfo[i].identityRevealed = false;
+                        puzzle.npcInfo[i].headMaterialIndex = -1;
+                        puzzle.npcInfo[i].bodyMaterialIndex = -1;
+                    }
+                }
+
                 break;
+            }
         }
 
-        for (int i = 0; i < npcCount; i++)
-        {
-            puzzle.npcInfo[i].label = npcLabels[i];
-            puzzle.npcInfo[i].discovered = false;
-            puzzle.npcInfo[i].statementText = puzzle.npcInfo[i].statement.ToText(npcLabels, i);
-        }
+        lastPuzzle = puzzle;
         return puzzle;
     }
 
-    private void GenerateSolutions(PuzzleData puzzle, System.Random rng)
+    public bool RerollSelected(PuzzleData puzzle, List<int> selectedIndices, System.Random rng)
+    {
+        if (selectedIndices == null || selectedIndices.Count == 0)
+            return false;
+
+        GameManager.Instance.currentPuzzle = Generate(puzzle.floorIndex, rng, true, selectedIndices);
+
+        return true;
+    }
+
+    private void GenerateSolutions(PuzzleData puzzle, System.Random rng, bool scytheUsed, List<int> selectedIndices)
     {
         for (int i = 0; i < puzzle.npcCount; i++)
-            puzzle.role[i] = (Role)rng.Next(1, 3);
-
-        if (puzzle.peasantRequired && !Array.Exists(puzzle.role, r => r == Role.Peasant))
-            puzzle.role[rng.Next(puzzle.npcCount)] = Role.Peasant;
+        {
+            if ((scytheUsed && selectedIndices.Contains(i)) || !scytheUsed)
+                puzzle.role[i] = (Role)rng.Next(1, 3);
+            else
+                puzzle.role[i] = (Role)0;
+        }
     }
 
     private void GenerateStatements(PuzzleData puzzle, int floor, System.Random rng)
     {
+        usedStatementVariants.Clear();
+
         var probs = PuzzleData.DifficultyProfile.GetTierProbabilities(floor);
-        float easy = probs.easy, medium = probs.medium, hard = probs.hard;
-        bool isPeasantFloor = puzzle.peasantRequired;
 
         for (int npc = 0; npc < puzzle.npcCount; npc++)
         {
+            StatementList type;
+            int variant;
+
+            int tries = 0;
+
             float roll = (float)rng.NextDouble();
-            StatementDifficulty tier = roll < easy ? StatementDifficulty.Easy : roll < easy + medium ? StatementDifficulty.Medium : StatementDifficulty.Hard;
 
-            var stmt = new StatementParser();
+            StatementDifficulty tier = roll < probs.easy ? StatementDifficulty.Easy : roll < probs.easy + probs.medium ? StatementDifficulty.Medium : StatementDifficulty.Hard;
 
-            stmt.statement = StatementsPool(tier, isPeasantFloor, rng);
-            stmt.variant = rng.Next(stmt.GetVariantCount(npcCount));
+            StatementParser stmt = new StatementParser();
+
+            do{
+                do
+                {
+                    StatementParser temp = new StatementParser();
+
+                    type = StatementsPool(tier, puzzle.peasantRequired, rng);
+                    temp.statement = type;
+
+                    variant = rng.Next(temp.GetVariantCount(npcCount));
+
+                    tries++;
+                    if (tries > 10000)
+                        break;
+
+                } while (usedStatementVariants.Contains(new StatementKey(type, variant)));
+
+                stmt.statement = type;
+                stmt.variant = variant;
+            } while (tier == StatementDifficulty.Easy && stmt.statement == StatementList.IsKnight && (stmt.variant != 1 && stmt.variant != 3));
+
+            usedStatementVariants.Add(new StatementKey(type, variant));
 
             AssignTargets(stmt, npc, puzzle.npcCount, rng);
 
-            puzzle.npcInfo[npc] = new PuzzleData.NPCInfo { statement = stmt };
-
-            usedStatementTypes.Add(stmt.statement);
+            puzzle.npcInfo[npc] = new PuzzleData.NPCInfo
+            {
+                statement = stmt
+            };
         }
     }
 
     private StatementList StatementsPool(StatementDifficulty tier, bool isPeasantFloor, System.Random rng)
     {
-        var pool = new List<StatementList>();
+        List<StatementList> pool = new List<StatementList>();
 
         if (tier == StatementDifficulty.Easy)
         {
@@ -105,55 +198,61 @@ public class PuzzleGenerator
         }
         else
         {
-            pool.AddRange(new[] { StatementList.EitherKnightOrKnight, StatementList.EitherKnightOrKnave,
-                    StatementList.EitherKnaveOrKnave, StatementList.ExactlyOneIsKnight,
-                    StatementList.ExactlyOneIsKnave });
+            pool.Add(StatementList.EitherKnightOrKnight);
+            pool.Add(StatementList.EitherKnightOrKnave);
+            pool.Add(StatementList.EitherKnaveOrKnave);
+            pool.Add(StatementList.ExactlyOneIsKnight);
+            pool.Add(StatementList.ExactlyOneIsKnave);
+
             if (!isPeasantFloor)
-                pool.AddRange(new[] { StatementList.OnlyKnightSayKnight, StatementList.OnlyKnightSayKnave,
-                        StatementList.OnlyKnaveSayKnight, StatementList.OnlyKnaveSayKnave });
+            {
+                pool.Add(StatementList.OnlyKnightSayKnight);
+                pool.Add(StatementList.OnlyKnightSayKnave);
+                pool.Add(StatementList.OnlyKnaveSayKnight);
+                pool.Add(StatementList.OnlyKnaveSayKnave);
+            }
         }
 
-        pool.RemoveAll(s => usedStatementTypes.Contains(s));
-
         if (pool.Count == 0)
-            pool.Add(StatementList.IsKnight);
+            return StatementList.IsKnight;
 
         return pool[rng.Next(pool.Count)];
     }
 
-    private void AssignTargets(StatementParser stmt, int npc, int npcCount, System.Random rng)
+    private void AssignTargets(StatementParser stmt, int selfIndex, int npcCount, System.Random rng)
     {
-        if (stmt.statement == StatementList.IsKnight || stmt.statement == StatementList.IsKnave || stmt.statement.ToString().Contains("Only"))
-            stmt.a = PickDistinctTarget(npc, npcCount, rng);
-        else if (stmt.statement.ToString().Contains("Either") || stmt.statement.ToString().Contains("Both") || stmt.statement == StatementList.RoleSame)
-        {
-            stmt.a = PickDistinctTarget(npc, npcCount, rng);
-            stmt.b = PickDistinctTarget(npc, npcCount, rng, stmt.a);
-
-            if (stmt.a == npc || stmt.b == npc)
-            {
-                stmt.a = PickDistinctTarget(npc, npcCount, rng); 
-                stmt.b = PickDistinctTarget(npc, npcCount, rng);
-            }
-
-            if (stmt.b == stmt.a || stmt.b == -1)
-            {
-                stmt.a = npc;
-                stmt.b = npc == 0 ? 1 : 0;
-            }
-        }
+        stmt.a = PickDistinctTarget(selfIndex, npcCount, rng);
+        stmt.b = PickDistinctTarget(selfIndex, npcCount, rng, stmt.a);
+        stmt.c = PickDistinctTarget(selfIndex, npcCount, rng, stmt.a, stmt.b);
+        stmt.d = PickDistinctTarget(selfIndex, npcCount, rng, stmt.a, stmt.b, stmt.c);
+        stmt.e = PickDistinctTarget(selfIndex, npcCount, rng, stmt.a, stmt.b, stmt.c, stmt.d);
     }
 
     private int PickDistinctTarget(int forbidden, int npcCount, System.Random rng, params int[] extra)
     {
         List<int> candidates = new List<int>();
+
         for (int i = 0; i < npcCount; i++)
         {
             if (i == forbidden) continue;
+
             bool blocked = false;
-            foreach (int f in extra) if (i == f) blocked = true;
-            if (!blocked) candidates.Add(i);
+            for (int j = 0; j < extra.Length; j++)
+            {
+                if (i == extra[j])
+                {
+                    blocked = true;
+                    break;
+                }
+            }
+
+            if (!blocked)
+                candidates.Add(i);
         }
-        return candidates.Count > 0 ? candidates[rng.Next(candidates.Count)] : 0;
+
+        if (candidates.Count == 0)
+            return Mathf.Clamp(forbidden == 0 ? 1 : 0, 0, npcCount - 1);
+
+        return candidates[rng.Next(candidates.Count)];
     }
 }

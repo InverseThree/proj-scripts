@@ -1,22 +1,15 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
-
-public enum StatementDifficulty
-{
-    Easy,
-    Medium,
-    Hard
-}
 
 [Serializable]
 public class StatementParser
 {
     public StatementList statement;
 
-    [Tooltip("Choose this once when the puzzle is generated. Do NOT randomize in Evaluate().")]
     [Min(0)]
     public int variant = 0;
-    
+
     public int a;
     public int b;
     public int c;
@@ -61,7 +54,7 @@ public class StatementParser
                 return 1;
         }
     }
-    
+
     public bool IsCompatibleWithPeasantFloor()
     {
         switch (statement)
@@ -156,15 +149,15 @@ public class StatementParser
                 return IsKnight(a);
 
             case StatementList.OnlyKnightSayKnave:
-                 // "Only a knight would say that A is a knave."
+                // "Only a knight would say that A is a knave."
                 return IsKnave(a);
 
             case StatementList.OnlyKnaveSayKnight:
-                 // "Only a kniave would say that A is a knight."
+                // "Only a knave would say that A is a knight."
                 return IsKnave(a);
 
             case StatementList.OnlyKnaveSayKnave:
-                 // "Only a knave would say that A is a knave."
+                // "Only a knave would say that A is a knave."
                 return IsKnight(a);
 
             case StatementList.EitherKnightOrKnight:
@@ -303,7 +296,7 @@ public class StatementParser
         Debug.LogWarning($"Invalid statement/variant combination: {statement} / {variant}");
         return false;
     }
-    
+
     public string ToText(string[] names, int selfIndex)
     {
         string A = GetName(names, a);
@@ -458,5 +451,96 @@ public class StatementParser
             return $"NPC[{index}]";
 
         return names[index];
+    }
+
+    public List<int> GetReferencedIndices(int selfIndex)
+    {
+        List<int> result = new List<int>();
+
+        void Add(int index)
+        {
+            if (index < 0)
+                return;
+            if (index == selfIndex)
+                return;
+            if (!result.Contains(index))
+                result.Add(index);
+        }
+
+        switch (statement)
+        {
+            case StatementList.IsKnight:
+            case StatementList.IsKnave:
+            case StatementList.OnlyKnightSayKnight:
+            case StatementList.OnlyKnightSayKnave:
+            case StatementList.OnlyKnaveSayKnight:
+            case StatementList.OnlyKnaveSayKnave:
+                Add(a);
+                break;
+
+            case StatementList.EitherKnightOrKnight:
+                if (variant == 0)
+                    Add(b);
+                else
+                {
+                    Add(a);
+                    Add(b);
+                }
+                break;
+
+            case StatementList.EitherKnightOrKnave:
+                if (variant == 0)
+                    Add(b);
+                else if (variant == 1)
+                    Add(a);
+                else
+                {
+                    Add(a);
+                    Add(b);
+                }
+                break;
+
+            case StatementList.EitherKnaveOrKnave:
+                if (variant == 0)
+                    Add(b);
+                else
+                {
+                    Add(a);
+                    Add(b);
+                }
+                break;
+
+            case StatementList.BothAreKnights:
+                if (variant == 0)
+                    Add(b);
+                else
+                {
+                    Add(a);
+                    Add(b);
+                }
+                break;
+
+            case StatementList.BothAreKnaves:
+                if (variant == 0)
+                    Add(b);
+                else
+                {
+                    Add(a);
+                    Add(b);
+                }
+                break;
+
+            case StatementList.RoleSame:
+                if (variant == 0 || variant == 1)
+                    Add(b);
+                else
+                {
+                    Add(a);
+                    Add(b);
+                }
+                break;
+        }
+
+        return result;
     }
 }

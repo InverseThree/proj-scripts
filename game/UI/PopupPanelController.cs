@@ -8,14 +8,13 @@ using TMPro;
 
 public class PopupPanelController : MonoBehaviour
 {
-    private GameObject popup;
-    private GameObject panel;
-    private GameObject table;
-    private GameObject answer;
-    private Toggle toggle;
-    private TextMeshProUGUI statement;
+    public GameObject popup;
+    public GameObject panel;
+    public GameObject table;
+    public GameObject answer;
+    public Toggle toggle;
 
-    private FloorManager floorManager;
+    public FloorManager floorManager;
 
     private GameObject layout;
 
@@ -39,6 +38,14 @@ public class PopupPanelController : MonoBehaviour
         popup.SetActive(false);
     }
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape) && !popup.activeSelf && !SayDialog.GetSayDialog().isActiveAndEnabled && !MenuDialog.GetMenuDialog().isActiveAndEnabled)
+            ShowPause();
+        else if (Input.GetKeyDown(KeyCode.Escape) && popup.activeSelf)
+            Cancel();
+    }
+
     public void ShowAnswerCorrect()
     {
         popup.SetActive(true);
@@ -50,6 +57,9 @@ public class PopupPanelController : MonoBehaviour
 
         option1 = layout.transform.Find("continue").gameObject.GetComponent<Button>();
         option2 = layout.transform.Find("exit").gameObject.GetComponent<Button>();
+
+        option1.onClick.RemoveAllListeners();
+        option2.onClick.RemoveAllListeners();
 
         option1.onClick.AddListener(RunFloorCleared);
         option2.onClick.AddListener(ReturnTitle);
@@ -66,6 +76,9 @@ public class PopupPanelController : MonoBehaviour
 
         option1 = layout.transform.Find("retry").gameObject.GetComponent<Button>();
         option2 = layout.transform.Find("exit").gameObject.GetComponent<Button>();
+
+        option1.onClick.RemoveAllListeners();
+        option2.onClick.RemoveAllListeners();
 
         option1.onClick.AddListener(Retry);
         option2.onClick.AddListener(ReturnTitle);
@@ -100,6 +113,9 @@ public class PopupPanelController : MonoBehaviour
         option1 = layout.transform.Find("retry").gameObject.GetComponent<Button>();
         option2 = layout.transform.Find("exit").gameObject.GetComponent<Button>();
 
+        option1.onClick.RemoveAllListeners();
+        option2.onClick.RemoveAllListeners();
+
         option1.onClick.AddListener(Retry);
         option2.onClick.AddListener(ReturnTitle);
     }
@@ -117,30 +133,35 @@ public class PopupPanelController : MonoBehaviour
         option2 = layout.transform.Find("retry").gameObject.GetComponent<Button>();
         option3 = layout.transform.Find("cancel").gameObject.GetComponent<Button>();
 
+        option1.onClick.RemoveAllListeners();
+        option2.onClick.RemoveAllListeners();
+        option3.onClick.RemoveAllListeners();
+
         option1.onClick.AddListener(ReturnTitle);
         option2.onClick.AddListener(Retry);
         option3.onClick.AddListener(Cancel);
     }
 
-    private void RunFloorCleared()
-    {
-        floorManager.StartCoroutine(floorManager.FloorCleared(true));
-    }
-
     private void ReturnTitle()
     {
+        GameManager.Instance.AdvanceFloor();
         SceneManager.LoadScene("title");
     }
 
     private void Retry()
     {
         GameManager.Instance.StartNewRun();
-        floorManager.StartCoroutine(floorManager.FloorCleared(false));
+        RunFloorCleared();
     }
 
     private void Cancel()
     {
         layout.SetActive(false);
         popup.SetActive(false);
+    }
+
+    private void RunFloorCleared()
+    {
+        floorManager.StartCoroutine(floorManager.ResolveFloorClear());
     }
 }
