@@ -68,5 +68,5 @@ Exactly one of us is a knight/knave.
 #### statements spawn percentage per floor
 floor 1-3: 70% easy statement, 20% medium statement, 10% hard statement<br/>
 floor 4-6: 30% easy statement, 50% medium statement, 20% hard statement<br/>
-floor 7-9: 20% easy statement, 40% medium statement, 40% hard statement
+floor 7-9: 20% easy statement, 40% medium statement, 40% hard statement<br/>
 floor 10 onward: 10% easy statement, 35% medium statement, 55% hard statement
