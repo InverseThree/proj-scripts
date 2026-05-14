@@ -394,7 +394,7 @@ public class FloorManager : MonoBehaviour
             yield return new WaitUntil(() => relicDone);
         }
 
-        if (clearedFloor == 3 || clearedFloor == 6 || clearedFloor == 9)
+        if (clearedFloor % 3 == 0 && clearedFloor != 0)
         {
             ItemType rewardItem = GetRandomItem();
 
