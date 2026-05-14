@@ -502,7 +502,11 @@ public class FloorManager : MonoBehaviour
                 return true;
 
             case ItemType.Lens:
-                GameManager.Instance.TryTakeDamage(1, out _, out _);
+                if (GameManager.Instance.TryTakeDamage(1, out _, out _))
+                {
+                    RevealSolution();
+                    popupPanelController.ShowGameOver();
+                }
                 RevealRandomIdentity();
                 GameManager.Instance.ClearItem();
                 return true;
