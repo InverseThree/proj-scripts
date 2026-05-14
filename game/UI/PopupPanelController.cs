@@ -144,7 +144,13 @@ public class PopupPanelController : MonoBehaviour
 
     private void ReturnTitle()
     {
-        GameManager.Instance.AdvanceFloor();
+        if (!panel.transform.Find("pause").gameObject.activeSelf)
+        {
+            if (panel.transform.Find("gameClear").gameObject.activeSelf)
+                GameManager.Instance.StartNewRun();
+
+            GameManager.Instance.AdvanceFloor();
+        }
         SceneManager.LoadScene("title");
     }
 
