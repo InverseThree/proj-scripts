@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Fungus;
 
 public class FloorManager : MonoBehaviour
 {
@@ -281,7 +282,9 @@ public class FloorManager : MonoBehaviour
 
     private IEnumerator ShardActivate()
     {
-		yield return null;
+        do
+            yield return null;
+        while (SayDialog.GetSayDialog().isActiveAndEnabled || MenuDialog.GetMenuDialog().isActiveAndEnabled);
 
 		List<ItemType> items = GetItemChoice(3, excludeMirrorOnFinalFloor: GameManager.Instance.currentFloor >= GameManager.Instance.GetFinalFloor());
 
