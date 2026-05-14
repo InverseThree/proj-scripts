@@ -478,6 +478,12 @@ public class FloorManager : MonoBehaviour
                 break;
 
             case RelicType.Lamp:
+                if (GameManager.Instance.modifierState.lampTotalUsed >= 3)
+                {
+                    rewardPanelController.ShowMessage(false, "Held Relic", "No wishes remain.");
+                    break;
+                }
+
                 lampPanelController.Show(currentPuzzle.npcCount, npcLabels, GameManager.Instance.modifierState, request =>
                     {
                         MakeWish(request);
@@ -622,12 +628,6 @@ public class FloorManager : MonoBehaviour
     {
         RunModifierState mods = GameManager.Instance.modifierState;
         PuzzleData.FloorSpecialState state = currentPuzzle.floorState;
-
-        if (mods.lampTotalUsed >= 3)
-        {
-            rewardPanelController.ShowMessage(false, "Held Relic", "No wishes remain.");
-            return;
-        }
 
         switch (request.type)
         {
