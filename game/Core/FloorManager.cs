@@ -30,7 +30,7 @@ public class FloorManager : MonoBehaviour
     [Header("Flow")]
     public ScreenFader screenFader;
 
-    private readonly List<NPCController> spawnedNpcs = new List<NPCController>();
+    public List<NPCController> spawnedNPCs = new List<NPCController>();
     private System.Random rng = new System.Random();
     private PuzzleGenerator generator = new PuzzleGenerator();
 
@@ -59,17 +59,17 @@ public class FloorManager : MonoBehaviour
         lampPanelController = FindObjectOfType<LampPanelController>();
         screenFader = FindObjectOfType<ScreenFader>();
 
-        GameObject[] spawnPoints = GameObject.FindGameObjectsWithTag("spawn");
-        npcSpawnPoints = new Transform[spawnPoints.Length];
-        for (int i = 0; i < spawnPoints.Length; i++)
-            npcSpawnPoints[i] = spawnPoints[i].transform;
+        GameObject spawnPoints = GameObject.FindGameObjectWithTag("spawn");
+        npcSpawnPoints = new Transform[6];
+        for (int i = 0; i < 6; i++)
+            npcSpawnPoints[i] = spawnPoints.transform.Find($"spawn{i}");
 
         GenerateFloor();
     }
 
     public void GenerateFloor()
     {
-		ClearSpawnedNpcs();
+		ClearSpawnedNPCs();
 
 		GameManager.Instance.currentPuzzle = generator.Generate(GameManager.Instance.currentFloor, rng, false, null);
 		PuzzleData puzzle = GameManager.Instance.currentPuzzle;
@@ -129,6 +129,7 @@ public class FloorManager : MonoBehaviour
         for (int i = 0; i < puzzle.npcCount; i++)
         {
 			Transform spawn;
+			int spawnedIndex = -1;
 
             index[i] = rng.Next(0, availableSpawns.Count);
 
@@ -136,6 +137,15 @@ public class FloorManager : MonoBehaviour
 			{
 				GameManager.Instance.npcSpawnedIndices.Add(index[i]);
 				spawn = availableSpawns[index[i]];
+
+                for (int j = 0; j < npcSpawnPoints.Length; j++)
+                {
+                    if (spawn == npcSpawnPoints[j])
+                    {
+                        spawnedIndex = j;
+                        break;
+                    }
+                }
 			}
 			else
 				spawn = availableSpawns[GameManager.Instance.npcSpawnedIndices[i]];
@@ -145,10 +155,10 @@ public class FloorManager : MonoBehaviour
 
             NPCController controller = npc.GetComponent<NPCController>();
 
-            controller.Setup(this, i, puzzle, statementController);
+            controller.Setup(this, i, spawnedIndex, puzzle, statementController);
 
             availableSpawns.RemoveAt(GameManager.Instance.currentPuzzle.floorState.scytheUsed ? GameManager.Instance.npcSpawnedIndices[i] : index[i]);
-            spawnedNpcs.Add(controller);
+            spawnedNPCs.Add(controller);
         }
 
     }
@@ -197,11 +207,11 @@ public class FloorManager : MonoBehaviour
 
     private void ApplyAppearances(PuzzleData puzzle)
     {
-        Debug.Log("ApplyAppearances called. NPCs: " + spawnedNpcs.Count + ", Materials head: " + headMaterials.Length + ", body: " + bodyMaterials.Length);
+        Debug.Log("ApplyAppearances called. NPCs: " + spawnedNPCs.Count + ", Materials head: " + headMaterials.Length + ", body: " + bodyMaterials.Length);
 
-        for (int i = 0; i < spawnedNpcs.Count && i < puzzle.npcCount; i++)
+        for (int i = 0; i < spawnedNPCs.Count && i < puzzle.npcCount; i++)
         {
-            NPCAppearance appearance = spawnedNpcs[i].appearance;
+            NPCAppearance appearance = spawnedNPCs[i].appearance;
 
             Debug.Log($"NPC {i} appearance component: " + (appearance == null ? "NULL" : "OK"));
 
@@ -435,7 +445,7 @@ public class FloorManager : MonoBehaviour
                     return;
                 }
 
-                scythePanelController.Show(currentPuzzle.npcCount, npcLabels, selected =>
+                scythePanelController.Show(selected =>
                     {
                         if (selected.Count == 0)
 						    return;
@@ -452,7 +462,7 @@ public class FloorManager : MonoBehaviour
 						    currentPuzzle.hints.Clear();
 						    currentPuzzle.floorState.ClearDerivedFloorHints();
 
-						    ClearSpawnedNpcs();
+						    ClearSpawnedNPCs();
 
 						    SpawnNPCs(currentPuzzle);
 						    DistributeAppearances(currentPuzzle);
@@ -759,15 +769,15 @@ public class FloorManager : MonoBehaviour
         answerPanelController.RevealAll(currentPuzzle.role);
     }
 
-    private void ClearSpawnedNpcs()
+    private void ClearSpawnedNPCs()
     {
-        for (int i = 0; i < spawnedNpcs.Count; i++)
+        for (int i = 0; i < spawnedNPCs.Count; i++)
         {
-            if (spawnedNpcs[i] != null)
-                Destroy(spawnedNpcs[i].gameObject);
+            if (spawnedNPCs[i] != null)
+                Destroy(spawnedNPCs[i].gameObject);
         }
 
-        spawnedNpcs.Clear();
+        spawnedNPCs.Clear();
     }
 
     public int GetNPCCount()

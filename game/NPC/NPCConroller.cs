@@ -7,16 +7,18 @@ public class NPCController: MonoBehaviour
 
     private FloorManager floorManager;
     private int npcIndex;
+    public int npcSpawnedIndex;
     public string npcName;
     public string statementText;
     private StatementController statementController;
 
     public string Label => npcName;
 
-    public void Setup(FloorManager owner, int index, PuzzleData puzzle, StatementController controller)
+    public void Setup(FloorManager owner, int index, int spawnedIndex, PuzzleData puzzle, StatementController controller)
     {
         floorManager = owner;
         npcIndex = index;
+        npcSpawnedIndex = spawnedIndex;
         npcName = puzzle.npcInfo[index].label;
         statementText = puzzle.npcInfo[index].statementText;
         statementController = controller;
