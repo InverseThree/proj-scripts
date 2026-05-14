@@ -1,6 +1,9 @@
 scripts for [this](https://github.com/InverseThree/logicAppProj), don't steal w/o my permission
 
-# patch
+# patches
+## V1.0.2 (2026 May 14)
+### bug fixes<br/>
+fix a bug where scythe can select the wrong npc indices when used from V1.0.1
 ## V1.0.1 (2026 May 14)
 ### bug fixes<br/>
 fix a bug where gameover screen doesn't show when lens kills the player<br/>
