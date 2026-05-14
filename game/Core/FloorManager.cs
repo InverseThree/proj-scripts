@@ -485,6 +485,7 @@ public class FloorManager : MonoBehaviour
                 break;
 
             default:
+                if (GameManager.Instance.heldRelic != RelicType.None)
                 rewardPanelController.ShowMessage(RewardTextLibrary.GetRelicName(GameManager.Instance.heldRelic), "This relic has no active ability.");
                 break;
         }
