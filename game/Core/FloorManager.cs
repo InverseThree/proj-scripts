@@ -442,7 +442,7 @@ public class FloorManager : MonoBehaviour
             case RelicType.Scythe:
                 if (currentPuzzle.floorState.scytheUsed)
                 {
-                    rewardPanelController.ShowMessage("Scythe of Origination", "This relic has already been used on this floor.");
+                    rewardPanelController.ShowMessage(false, "Held Relic", "This relic has already been used on this floor.");
                     return;
                 }
 
@@ -486,7 +486,7 @@ public class FloorManager : MonoBehaviour
 
             default:
                 if (GameManager.Instance.heldRelic != RelicType.None)
-                rewardPanelController.ShowMessage(RewardTextLibrary.GetRelicName(GameManager.Instance.heldRelic), "This relic has no active ability.");
+                rewardPanelController.ShowMessage(false, "Held Relic", "This relic has no active ability.");
                 break;
         }
     }
@@ -553,7 +553,7 @@ public class FloorManager : MonoBehaviour
 
         if (candidates.Count == 0)
         {
-            rewardPanelController.ShowMessage("Lens of Devil", "No valid inhabitant is left to reveal.");
+            rewardPanelController.ShowMessage(true, "Held Item", "No valid inhabitant is left to reveal.");
             return;
         }
 
@@ -625,7 +625,7 @@ public class FloorManager : MonoBehaviour
 
         if (mods.lampTotalUsed >= 3)
         {
-            rewardPanelController.ShowMessage("Lamp of Oracle", "No wishes remain.");
+            rewardPanelController.ShowMessage(false, "Held Relic", "No wishes remain.");
             return;
         }
 

@@ -74,11 +74,17 @@ public class RewardPanelController : MonoBehaviour
         currentRelicChoices = null;
     }
 
-    public void ShowMessage(string title, string message)
+    public void ShowMessage(bool isItem, string title, string message)
     {
         root.SetActive(true);
+        rewards[0].gameObject.transform.parent.gameObject.SetActive(true);
         titleText.text = title;
         warningText.text = message;
+
+        if (isItem)
+            rewards[0].SetupItem(this, 0, GameManager.Instance.heldItem);
+        else
+            rewards[0].SetupRelic(this, 0, GameManager.Instance.heldRelic);
 
         returnButton.gameObject.SetActive(true);
         returnButton.onClick.RemoveAllListeners();
@@ -89,7 +95,10 @@ public class RewardPanelController : MonoBehaviour
     {
         root.SetActive(true);
 
-        titleText.text = RewardTextLibrary.GetItemName(item);
+        titleText.text = "Held Item";
+
+        rewards[0].gameObject.transform.parent.gameObject.SetActive(true);
+        rewards[0].SetupItem(this, 0, GameManager.Instance.heldItem);
 
         if (item == ItemType.Tonic && GameManager.Instance.currentHealth == GameManager.Instance.currentMaxHealth)
         {
@@ -99,7 +108,7 @@ public class RewardPanelController : MonoBehaviour
         else
         {
             takeButton.interactable = true;
-            warningText.text = RewardTextLibrary.GetItemDescription(item);
+            warningText.text = "Do you want to use this item?";
         }
 
         yesNoCallback = callback;
