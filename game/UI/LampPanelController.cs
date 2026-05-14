@@ -31,6 +31,7 @@ public class LampPanelController : MonoBehaviour
     private void Update()
     {
         RunModifierState state = GameManager.Instance.modifierState;
+        PuzzleData.FloorSpecialState floorState = GameManager.Instance.currentPuzzle.floorState;
 
         if (typeDropdown.value == 0)
         {
@@ -57,14 +58,24 @@ public class LampPanelController : MonoBehaviour
             if (state.lampPairTotalUsed == 2 || state.lampTotalUsed == 3 || npcADropdown.value == npcBDropdown.value)
                 confirmButton.interactable = false;
             else
+            {
+                for (int i = 0; i < floorState.lampPairHints.Count; i++)
+                {
+                    if ((floorState.lampPairHints[i].a == npcADropdown.value && floorState.lampPairHints[i].b == npcBDropdown.value) || (floorState.lampPairHints[i].b == npcADropdown.value && floorState.lampPairHints[i].a == npcBDropdown.value))
+                    {
+                        confirmButton.interactable = false;
+                        return;
+                    }
+                }
                 confirmButton.interactable = true;
+            }
         }
         else if (typeDropdown.value == 3)
         {
             npcADropdown.gameObject.SetActive(false);
             npcBDropdown.gameObject.SetActive(false);
 
-            if (state.lampCountTotalUsed == 3 || state.lampTotalUsed == 3)
+            if (state.lampCountTotalUsed == 3 || state.lampTotalUsed == 3 || floorState.lampCountGranted)
                 confirmButton.interactable = false;
             else
                 confirmButton.interactable = true;
