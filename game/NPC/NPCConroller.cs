@@ -6,7 +6,7 @@ public class NPCController: MonoBehaviour
     public NPCAppearance appearance;
 
     private FloorManager floorManager;
-    private int npcIndex;
+    public int npcIndex;
     public int npcSpawnedIndex;
     public string npcName;
     public string statementText;

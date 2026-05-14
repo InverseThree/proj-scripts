@@ -32,6 +32,8 @@ public class PuzzleGenerator
 
     private PuzzleData lastPuzzle;
 
+    private FloorManager floorManager;
+
     HashSet<StatementKey> usedStatementVariants = new();
 
     public PuzzleData Generate(int floorIndex, System.Random rng, bool scytheUsed, List<int> selectedIndices)
@@ -109,12 +111,25 @@ public class PuzzleGenerator
         return puzzle;
     }
 
-    public bool RerollSelected(PuzzleData puzzle, List<int> selectedIndices, System.Random rng)
+    public bool RerollSelected(PuzzleData puzzle, FloorManager floorManager, List<int> selectedIndices, System.Random rng)
     {
         if (selectedIndices == null || selectedIndices.Count == 0)
             return false;
 
-        GameManager.Instance.currentPuzzle = Generate(puzzle.floorIndex, rng, true, selectedIndices);
+        List<int> indicesList = new List<int>();
+        foreach (int index in selectedIndices)
+        {
+            for (int i = 0; i < puzzle.npcCount; i++)
+            {
+                if (floorManager.spawnedNPCs[i].npcSpawnedIndex == index)
+                {
+                    indicesList.Add(floorManager.spawnedNPCs[i].npcIndex);
+                    break;
+                }
+            }
+        }
+
+        GameManager.Instance.currentPuzzle = Generate(puzzle.floorIndex, rng, true, indicesList);
 
         return true;
     }

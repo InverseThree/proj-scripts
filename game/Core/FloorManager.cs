@@ -450,7 +450,7 @@ public class FloorManager : MonoBehaviour
                         if (selected.Count == 0)
 						    return;
 
-                        bool success = generator.RerollSelected(currentPuzzle, selected, rng);
+                        bool success = generator.RerollSelected(currentPuzzle, this, selected, rng);
                         if (success)
                         {
 						    for (int i = 0; i < currentPuzzle.npcCount; i++)
