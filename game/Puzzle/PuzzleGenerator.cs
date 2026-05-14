@@ -32,8 +32,6 @@ public class PuzzleGenerator
 
     private PuzzleData lastPuzzle;
 
-    private FloorManager floorManager;
-
     HashSet<StatementKey> usedStatementVariants = new();
 
     public PuzzleData Generate(int floorIndex, System.Random rng, bool scytheUsed, List<int> selectedIndices)
