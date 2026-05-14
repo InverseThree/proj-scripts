@@ -260,6 +260,7 @@ public class FloorManager : MonoBehaviour
             }
 
             puzzle.npcInfo[i].statementText = puzzle.npcInfo[i].statement.ToText(names, i);
+            spawnedNPCs[i].statementText = puzzle.npcInfo[i].statementText;
         }
 
         if (GameManager.Instance.modifierState.mirrorPending && puzzle.floorState.mirrorHintA < 0)
@@ -467,8 +468,6 @@ public class FloorManager : MonoBehaviour
 						    SpawnNPCs(currentPuzzle);
 						    DistributeAppearances(currentPuzzle);
 						    ApplyAppearances(currentPuzzle);
-
-						    ModifyDisplayText(currentPuzzle);
 
 						    answerPanelController.BuildFromPuzzle(GameManager.Instance.currentPuzzle);
 						    hintLogController.BuildFromPuzzle(GameManager.Instance.currentPuzzle);
