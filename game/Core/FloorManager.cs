@@ -754,6 +754,8 @@ public class FloorManager : MonoBehaviour
 
     private void RevealSolution()
     {
+        for (int i = 0; i < currentPuzzle.npcCount; i++)
+            RevealStatement(i);
         answerPanelController.RevealAll(currentPuzzle.role);
     }
 
