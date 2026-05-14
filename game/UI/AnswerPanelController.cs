@@ -79,10 +79,12 @@ public class AnswerPanelController : MonoBehaviour
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Tab) && !popup.activeSelf && !SayDialog.GetSayDialog().isActiveAndEnabled && !MenuDialog.GetMenuDialog().isActiveAndEnabled)
-        {
             toggle.isOn = !toggle.isOn;
-            rowsContainer.SetActive(!rowsContainer.activeSelf);
-        }
+    }
+
+    public void SetRowsContainer()
+    {
+        rowsContainer.SetActive(!rowsContainer.activeSelf);
     }
 
     private void SetSubmitButton()
