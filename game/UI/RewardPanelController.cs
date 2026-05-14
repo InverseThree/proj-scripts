@@ -20,6 +20,8 @@ public class RewardPanelController : MonoBehaviour
     public Button takeAndUseButton;
     public Button returnButton;
 
+    private bool selectable;
+
     private List<ItemType> currentItemChoices;
     private List<RelicType> currentRelicChoices;
     private int selectedIndex = -1;
@@ -58,6 +60,7 @@ public class RewardPanelController : MonoBehaviour
 
     public void Hide()
     {
+        selectable = false;
         root.SetActive(false);
         confirmButton.gameObject.SetActive(false);
         discardButton.gameObject.SetActive(false);
@@ -76,6 +79,7 @@ public class RewardPanelController : MonoBehaviour
 
     public void ShowMessage(bool isItem, string title, string message)
     {
+        selectable = false;
         root.SetActive(true);
         rewards[0].gameObject.transform.parent.gameObject.SetActive(true);
         titleText.text = title;
@@ -93,6 +97,7 @@ public class RewardPanelController : MonoBehaviour
 
     public void ShowUseItemPrompt(ItemType item, Action<bool> callback)
     {
+        selectable = false;
         root.SetActive(true);
 
         titleText.text = "Held Item";
@@ -137,6 +142,7 @@ public class RewardPanelController : MonoBehaviour
 
     public void ShowItemOffer(ItemType item, bool canTake, bool slotFull, Action<ItemOptions> callback)
     {
+        selectable = false;
         root.SetActive(true);
         titleText.text = "Item Obtained";
         warningText.text = canTake ? (slotFull ? "Warning: This will replace your current item." : "") : "Scythe of Origination removed your item slot. You can only discard this item.";
@@ -183,6 +189,7 @@ public class RewardPanelController : MonoBehaviour
 
     public void ShowItemChoice(List<ItemType> items, bool slotFull, Action<ItemType> callback)
     {
+        selectable = true;
         root.SetActive(true);
         titleText.text = "Choose 1 Item";
         warningText.text = slotFull ? "Warning: This will replace your current item." : "";
@@ -226,6 +233,7 @@ public class RewardPanelController : MonoBehaviour
 
     public void ShowRelicChoice(List<RelicType> relics, Action<RelicType> callback)
     {
+        selectable = true;
         root.SetActive(true);
         titleText.text = "Choose 1 Relic";
         warningText.text = "";
@@ -257,6 +265,9 @@ public class RewardPanelController : MonoBehaviour
 
     public void SelectReward(int index)
     {
+        if (!selectable)
+            return;
+
         selectedIndex = index;
 
         for (int i = 0; i < rewards.Length; i++)
