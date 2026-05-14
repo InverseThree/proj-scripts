@@ -39,7 +39,7 @@ public class PuzzleGenerator
         RunModifierState mods = GameManager.Instance.modifierState;
 
         if (mods.brushActive)
-            npcCount = floorIndex <= 6 ? rng.Next(2, 4) : floorIndex <= 9 ? rng.Next(2, 5) : rng.Next(2, 6);
+            npcCount = rng.Next(2, 7);
         else
             npcCount = floorIndex <= 3 ? 2 : floorIndex <= 6 ? 3 : floorIndex <= 9 ? 4 : 5;
 
