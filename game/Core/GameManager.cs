@@ -9,6 +9,8 @@ public class GameManager : MonoBehaviour
 
     public static GameManager Instance;
 
+    private ScreenShake screenShake;
+
     [Header("Run Settings")]
     public int baseMaxHealth = 3;
 
@@ -44,6 +46,7 @@ public class GameManager : MonoBehaviour
     {
         flowchart = GameObject.FindGameObjectWithTag("flow").GetComponent<Flowchart>();
         runInfoController = FindObjectOfType<RunInfoController>();
+        screenShake = FindObjectOfType<ScreenShake>();
 
         flowchart.SetBooleanVariable("tut", !tutorialCompleted);
         flowchart.SetIntegerVariable("floor", currentFloor);
@@ -210,6 +213,7 @@ public class GameManager : MonoBehaviour
         }
 
         currentHealth = Mathf.Max(0, currentHealth - amount);
+        screenShake.Shake();
 
         if (currentHealth <= 0 && modifierState.coinActive && !modifierState.coinRevived)
         {
