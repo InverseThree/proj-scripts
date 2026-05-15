@@ -32,11 +32,16 @@ public class PuzzleGenerator
 
     private PuzzleData lastPuzzle;
 
+    private List<StatementList> statementPool = new List<StatementList>();
+
     HashSet<StatementKey> usedStatementVariants = new();
 
     public PuzzleData Generate(int floorIndex, System.Random rng, bool scytheUsed, List<int> selectedIndices)
     {
         RunModifierState mods = GameManager.Instance.modifierState;
+
+        foreach (StatementList statement in Enum.GetValues(typeof(StatementList)))
+            statementPool.Add(statement);
 
         if (mods.brushActive)
             npcCount = rng.Next(2, 7);
@@ -162,25 +167,28 @@ public class PuzzleGenerator
 
             StatementParser stmt = new StatementParser();
 
-            do{
-                do
-                {
-                    StatementParser temp = new StatementParser();
+            do
+            {
+                StatementParser temp = new StatementParser();
 
-                    type = StatementsPool(tier, puzzle.peasantRequired, rng);
+                do{
+                    type = GetRandomStatement(rng);
                     temp.statement = type;
 
                     variant = rng.Next(temp.GetVariantCount(npcCount));
+                    if (variant < 1)
+                        continue;
 
-                    tries++;
-                    if (tries > 10000)
-                        break;
+                    temp.variant = variant;
+                } while (temp.GetSuggestedDifficulty(npcCount) != tier || (puzzle.peasantRequired && !temp.IsCompatibleWithPeasantFloor()));
 
-                } while (usedStatementVariants.Contains(new StatementKey(type, variant)));
+                tries++;
+                if (tries > 10000)
+                    break;
+            } while (usedStatementVariants.Contains(new StatementKey(type, variant)));
 
-                stmt.statement = type;
-                stmt.variant = variant;
-            } while (tier == StatementDifficulty.Easy && stmt.statement == StatementList.IsKnight && (stmt.variant != 1 && stmt.variant != 3));
+            stmt.statement = type;
+            stmt.variant = variant;
 
             usedStatementVariants.Add(new StatementKey(type, variant));
 
@@ -193,43 +201,9 @@ public class PuzzleGenerator
         }
     }
 
-    private StatementList StatementsPool(StatementDifficulty tier, bool isPeasantFloor, System.Random rng)
+    private StatementList GetRandomStatement(System.Random rng)
     {
-        List<StatementList> pool = new List<StatementList>();
-
-        if (tier == StatementDifficulty.Easy)
-        {
-            pool.Add(StatementList.IsKnight);
-            pool.Add(StatementList.IsKnave);
-        }
-        else if (tier == StatementDifficulty.Medium)
-        {
-            pool.Add(StatementList.IsKnight);
-            pool.Add(StatementList.BothAreKnights);
-            pool.Add(StatementList.BothAreKnaves);
-            pool.Add(StatementList.RoleSame);
-        }
-        else
-        {
-            pool.Add(StatementList.EitherKnightOrKnight);
-            pool.Add(StatementList.EitherKnightOrKnave);
-            pool.Add(StatementList.EitherKnaveOrKnave);
-            pool.Add(StatementList.ExactlyOneIsKnight);
-            pool.Add(StatementList.ExactlyOneIsKnave);
-
-            if (!isPeasantFloor)
-            {
-                pool.Add(StatementList.OnlyKnightSayKnight);
-                pool.Add(StatementList.OnlyKnightSayKnave);
-                pool.Add(StatementList.OnlyKnaveSayKnight);
-                pool.Add(StatementList.OnlyKnaveSayKnave);
-            }
-        }
-
-        if (pool.Count == 0)
-            return StatementList.IsKnight;
-
-        return pool[rng.Next(pool.Count)];
+        return statementPool[rng.Next(statementPool.Count)];
     }
 
     private void AssignTargets(StatementParser stmt, int selfIndex, int npcCount, System.Random rng)
