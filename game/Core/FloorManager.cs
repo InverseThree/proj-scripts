@@ -396,7 +396,7 @@ public class FloorManager : MonoBehaviour
 
         if (clearedFloor % 3 == 0 && clearedFloor != 0)
         {
-            ItemType rewardItem = GetRandomItem();
+            ItemType rewardItem = GetRandomItem(excludeMirrorOnFinalFloor: GameManager.Instance.currentFloor >= GameManager.Instance.GetFinalFloor());
 
             bool itemDone = false;
 
@@ -700,7 +700,7 @@ public class FloorManager : MonoBehaviour
         hintLogController.BuildFromPuzzle(currentPuzzle);
     }
 
-    private ItemType GetRandomItem()
+    private ItemType GetRandomItem(bool excludeMirrorOnFinalFloor)
     {
         List<ItemType> pool = new List<ItemType>
         {
@@ -711,6 +711,9 @@ public class FloorManager : MonoBehaviour
             ItemType.Mirror,
             ItemType.Hourglass
         };
+
+        if (excludeMirrorOnFinalFloor)
+            pool.Remove(ItemType.Mirror);
 
         return pool[rng.Next(pool.Count)];
     }
