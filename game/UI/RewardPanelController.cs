@@ -174,16 +174,16 @@ public class RewardPanelController : MonoBehaviour
                 Hide();
             });
 
-            if ((item == ItemType.Tonic && GameManager.Instance.currentHealth != GameManager.Instance.currentMaxHealth) || item == ItemType.Mirror)
-            {
-                takeAndUseButton.gameObject.SetActive(true);
-                takeAndUseButton.onClick.RemoveAllListeners();
-                takeAndUseButton.onClick.AddListener(() =>
-                {
-                    itemOptionsCallback?.Invoke(ItemOptions.TakeAndUse);
-                    Hide();
-                });
-            }
+            // if ((item == ItemType.Tonic && GameManager.Instance.currentHealth != GameManager.Instance.currentMaxHealth) || item == ItemType.Mirror)
+            // {
+            //     takeAndUseButton.gameObject.SetActive(true);
+            //     takeAndUseButton.onClick.RemoveAllListeners();
+            //     takeAndUseButton.onClick.AddListener(() =>
+            //     {
+            //         itemOptionsCallback?.Invoke(ItemOptions.TakeAndUse);
+            //         Hide();
+            //     });
+            // }
         }
     }
 
