@@ -143,7 +143,7 @@ public class StatementParser
         bool IsPeasant(int i) => roles[i] == Role.Peasant;
         bool Xor(bool left, bool right) => left ^ right;
         bool SameRole(int x, int y) => roles[x] == roles[y];
-        float Halve() => roles.Length / 2;
+        float Halve() => ((float)roles.Length) / 2;
         int Count(Role role)
         {
             int count = 0;
