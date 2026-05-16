@@ -36,6 +36,9 @@ public class FloorManager : MonoBehaviour
 
     private PuzzleData currentPuzzle => GameManager.Instance.currentPuzzle;
 
+    private List<ItemType> itemPool = new List<ItemType>();
+    private List<RelicType> relicPool = new List<RelicType>();
+
     private void OnEnable()
     {
         SceneManager.sceneLoaded += OnSceneLoaded;
@@ -63,6 +66,21 @@ public class FloorManager : MonoBehaviour
         npcSpawnPoints = new Transform[6];
         for (int i = 0; i < 6; i++)
             npcSpawnPoints[i] = spawnPoints.transform.Find($"spawn{i}");
+
+        itemPool.Clear();
+        relicPool.Clear();
+
+        foreach (ItemType item in Enum.GetValues(typeof(ItemType)))
+        {
+            if (item != ItemType.None)
+                itemPool.Add(item);
+        }
+
+        foreach (RelicType relic in Enum.GetValues(typeof(RelicType)))
+        {
+            if (relic != RelicType.None)
+                relicPool.Add(relic);
+        }
 
         GenerateFloor();
     }
@@ -297,7 +315,8 @@ public class FloorManager : MonoBehaviour
             yield return null;
         while (SayDialog.GetSayDialog().isActiveAndEnabled || MenuDialog.GetMenuDialog().isActiveAndEnabled);
 
-		List<ItemType> items = GetItemChoice(3, excludeMirrorOnFinalFloor: GameManager.Instance.currentFloor >= GameManager.Instance.GetFinalFloor());
+        filterItemPool(excludeMirrorOnFinalFloor: GameManager.Instance.currentFloor >= GameManager.Instance.GetFinalFloor());
+		List<ItemType> items = GetItemChoice(3);
 
 		bool done = false;
 		rewardPanelController.ShowItemChoice(items, GameManager.Instance.heldItem != ItemType.None, selected =>
@@ -396,7 +415,8 @@ public class FloorManager : MonoBehaviour
 
         if (clearedFloor % 3 == 0 && clearedFloor != 0)
         {
-            ItemType rewardItem = GetRandomItem(excludeMirrorOnFinalFloor: GameManager.Instance.currentFloor >= GameManager.Instance.GetFinalFloor());
+            filterItemPool(excludeMirrorOnFinalFloor: GameManager.Instance.currentFloor >= GameManager.Instance.GetFinalFloor());
+            ItemType rewardItem = GetRandomItem();
 
             bool itemDone = false;
 
@@ -700,55 +720,34 @@ public class FloorManager : MonoBehaviour
         hintLogController.BuildFromPuzzle(currentPuzzle);
     }
 
-    private ItemType GetRandomItem(bool excludeMirrorOnFinalFloor)
+    private void filterItemPool(bool excludeMirrorOnFinalFloor)
     {
-        List<ItemType> pool = new List<ItemType>
-        {
-            ItemType.Tonic,
-            ItemType.Shield,
-            ItemType.Lens,
-            ItemType.Scroll,
-            ItemType.Mirror,
-            ItemType.Hourglass
-        };
-
         if (excludeMirrorOnFinalFloor)
-            pool.Remove(ItemType.Mirror);
+            itemPool.Remove(ItemType.Mirror);
 
-        return pool[rng.Next(pool.Count)];
+        foreach (ItemType item in itemPool)
+        {
+            if (GameManager.Instance.heldItem == item)
+            {
+                itemPool.Remove(item);
+                break;
+            }
+        }
     }
 
-    private List<ItemType> GetItemChoice(int count, bool excludeMirrorOnFinalFloor)
+    private ItemType GetRandomItem()
     {
-        List<ItemType> pool = new List<ItemType>
-        {
-            ItemType.Tonic,
-            ItemType.Shield,
-            ItemType.Lens,
-            ItemType.Scroll,
-            ItemType.Mirror,
-            ItemType.Hourglass
-        };
+        return itemPool[rng.Next(itemPool.Count)];
+    }
 
-        if (excludeMirrorOnFinalFloor)
-            pool.Remove(ItemType.Mirror);
-
-		return AddReward<ItemType>(pool, count);
+    private List<ItemType> GetItemChoice(int count)
+    {
+		return AddReward<ItemType>(itemPool, count);
     }
 
     private List<RelicType> GetRelicChoice(int count)
     {
-        List<RelicType> pool = new List<RelicType>
-        {
-            RelicType.Coin,
-            RelicType.Brush,
-            RelicType.Talisman,
-            RelicType.Shard,
-            RelicType.Scythe,
-            RelicType.Lamp
-        };
-
-		return AddReward<RelicType>(pool, count);
+		return AddReward<RelicType>(relicPool, count);
     }
 
 	private List<T> AddReward<T>(List<T> pool, int count)
