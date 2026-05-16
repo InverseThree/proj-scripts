@@ -3,28 +3,35 @@ public enum StatementList
     IsKnight,
     IsKnave,
 
+    HalfAreKnights,
+    HalfAreKnaves,
+
+    ExactlyXAreKnights,
+    ExactlyXAreKnaves,
+
     OnlyKnightSayKnight,
     OnlyKnightSayKnave,
     OnlyKnaveSayKnight,
     OnlyKnaveSayKnave,
 
-    EitherKnightOrKnight,
-    EitherKnightOrKnave,
-    EitherKnaveOrKnave,
+    CouldSayKnight,
+    CouldSayKnave,
+
     BothAreKnights,
     BothAreKnaves,
+
+    EitherKnightOrKnight,
+    EitherKnaveOrKnave,
+    EitherKnightOrKnave,
     RoleSame,
 
-    ExactlyOneIsKnight,
-    ExactlyOneIsKnave
+    KnightWhenKnight,
+    KnightWhenKnave,
+    KnaveWhenKnight,
+    KnaveWhenKnave,
 
-    // IfKnightThenKnight,
-    // IfKnightThenKnave,
-    // IfKnaveThenKnight,
-    // IfKnaveThenKnave,
-    //
-    // KnightUnlessKnight,
-    // KnightUnlessKnave,
-    // KnaveUnlessKnight,
-    // KnaveUnlessKnave
+    KnightNecessaryForKnight,
+    KnightNecessaryForKnave,
+    KnaveNecessaryForKnight,
+    KnaveNecessaryForKnave
 }
