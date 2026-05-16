@@ -153,7 +153,6 @@ public class StatementParser
             return count;
         }
 
-
         switch (statement)
         {
             case StatementList.IsKnight:
@@ -490,12 +489,12 @@ public class StatementParser
                 switch (variant)
                 {
                     case 0:
-                        // "A being a knight is necessary for B to be a knight."
-                        return !IsKnight(a) || IsKnight(b);
+                        // "A being a knight is necessary but not sufficient for B to be a knight."
+                        return IsKnight(a) || !IsKnight(b);
 
                     case 1:
-                        // "A being a knight is sufficient for B to be a knight."
-                        return IsKnight(a) || !IsKnight(b);
+                        // "A being a knight is sufficient but not necessary for B to be a knight."
+                        return !IsKnight(a) || IsKnight(b);
 
                     case 2:
                         // "A being a knight is both necessary and sufficient for B to be a knight."
@@ -507,12 +506,12 @@ public class StatementParser
                 switch (variant)
                 {
                     case 0:
-                        // "A being a knight is necessary for B to be a knave."
-                        return !IsKnight(a) || IsKnave(b);
+                        // "A being a knight is necessary but not sufficient for B to be a knave."
+                        return IsKnight(a) || !IsKnave(b);
 
                     case 1:
-                        // "A being a knight is sufficient for B to be a knsve."
-                        return IsKnight(a) || !IsKnave(b);
+                        // "A being a knight is sufficient but not necessary for B to be a knsve."
+                        return !IsKnight(a) || IsKnave(b);
 
                     case 2:
                         // "A being a knight is both necessary and sufficient for B to be a knave."
@@ -524,12 +523,12 @@ public class StatementParser
                 switch (variant)
                 {
                     case 0:
-                        // "A being a knave is necessary for B to be a knight."
-                        return !IsKnave(a) || IsKnight(b);
+                        // "A being a knave is necessary but not sufficient for B to be a knight."
+                        return IsKnave(a) || !IsKnight(b);
 
                     case 1:
-                        // "A being a knave is sufficient for B to be a knight."
-                        return IsKnave(a) || !IsKnight(b);
+                        // "A being a knave is sufficient but not necessary for B to be a knight."
+                        return !IsKnave(a) || IsKnight(b);
 
                     case 2:
                         // "A being a knave is both necessary and sufficient for B to be a knight."
@@ -541,12 +540,12 @@ public class StatementParser
                 switch (variant)
                 {
                     case 0:
-                        // "A being a knave is necessary for B to be a knave."
-                        return !IsKnave(a) || IsKnave(b);
+                        // "A being a knave is necessary but not sufficient for B to be a knave."
+                        return IsKnave(a) || !IsKnave(b);
 
                     case 1:
-                        // "A being a knave is sufficient for B to be a knsve."
-                        return IsKnave(a) || !IsKnave(b);
+                        // "A being a knave is sufficient but not necessary for B to be a knsve."
+                        return !IsKnave(a) || IsKnave(b);
 
                     case 2:
                         // "A being a knave is both necessary and sufficient for B to be a knave."
@@ -833,10 +832,10 @@ public class StatementParser
                 switch (variant)
                 {
                     case 0:
-                        return $"{A} being a knight is necessary for {B} to be a knight.";
+                        return $"{A} being a knight is necessary but not sufficient for {B} to be a knight.";
 
                     case 1:
-                        return $"{A} being a knight is sufficient for {B} to be a knight.";
+                        return $"{A} being a knight is sufficient but not necessary for {B} to be a knight.";
 
                     case 2:
                         return $"{A} being a knight is both necessary and sufficient for {B} to be a knight.";
@@ -847,10 +846,10 @@ public class StatementParser
                 switch (variant)
                 {
                     case 0:
-                        return $"{A} being a knight is necessary for {B} to be a knave.";
+                        return $"{A} being a knight is necessary but not sufficient for {B} to be a knave.";
 
                     case 1:
-                        return $"{A} being a knight is sufficient for {B} to be a knave.";
+                        return $"{A} being a knight is sufficient but not necessary for {B} to be a knave.";
 
                     case 2:
                         return $"{A} being a knight is both necessary and sufficient for {B} to be a knave.";
@@ -861,10 +860,10 @@ public class StatementParser
                 switch (variant)
                 {
                     case 0:
-                        return $"{A} being a knave is necessary for {B} to be a knight.";
+                        return $"{A} being a knave is necessary but not sufficient for {B} to be a knight.";
 
                     case 1:
-                        return $"{A} being a knave is sufficient for {B} to be a knight.";
+                        return $"{A} being a knave is sufficient but not necessary for {B} to be a knight.";
 
                     case 2:
                         return $"{A} being a knave is both necessary and sufficient for {B} to be a knight.";
@@ -875,10 +874,10 @@ public class StatementParser
                 switch (variant)
                 {
                     case 0:
-                        return $"{A} being a knave is necessary for {B} to be a knave.";
+                        return $"{A} being a knave is necessary but not sufficient for {B} to be a knave.";
 
                     case 1:
-                        return $"{A} being a knave is sufficient for {B} to be a knave.";
+                        return $"{A} being a knave is sufficient but not necessary for {B} to be a knave.";
 
                     case 2:
                         return $"{A} being a knave is both necessary and sufficient for {B} to be a knave.";
