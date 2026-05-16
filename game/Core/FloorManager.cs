@@ -725,6 +725,9 @@ public class FloorManager : MonoBehaviour
         if (excludeMirrorOnFinalFloor)
             itemPool.Remove(ItemType.Mirror);
 
+        if (GameManager.Instance.modifierState.talismanActive)
+            itemPool.Remove(ItemType.Tonic);
+
         foreach (ItemType item in itemPool)
         {
             if (GameManager.Instance.heldItem == item)
