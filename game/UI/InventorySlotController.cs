@@ -12,55 +12,23 @@ public class InventorySlotController : MonoBehaviour, IPointerEnterHandler, IPoi
     }
 
     public Button root;
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.EventSystems;
-using Fungus;
-
-public class InventorySlotController : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
-{
-    public enum SlotType
-    {
-        Item, 
-        Relic
-    }
-
-    public Button root;
     public Button iconButton;
     public SlotType slotType;
     public Image iconImage;
     public GameObject emptyMarker;
     public GameObject disableMarker;
 
-    private void Update()
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.EventSystems;
-using Fungus;
-
-public class InventorySlotController : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
-{
-    public enum SlotType
-    {
-        Item, 
-        Relic
-    }
-
-    public Button root;
-    public Button iconButton;
-    public SlotType slotType;
-    public Image iconImage;
-    public GameObject emptyMarker;
-    public GameObject disableMarker;
+    private bool scytheActive = false;
 
     private void Update()
     {
-        if (SayDialog.GetSayDialog().isActiveAndEnabled || MenuDialog.GetMenuDialog().isActiveAndEnabled)
+        if (SayDialog.GetSayDialog().isActiveAndEnabled || MenuDialog.GetMenuDialog().isActiveAndEnabled || scytheActive)
         {
             root.interactable = false;
             iconButton.interactable = false;
+            disableMarker.GetComponent<Button>().interactable = false;
         }
-        else
+        else if (!scytheActive)
         {
             root.interactable = true;
             iconButton.interactable = true;
@@ -73,7 +41,7 @@ public class InventorySlotController : MonoBehaviour, IPointerEnterHandler, IPoi
         {
             ItemType item = GameManager.Instance.heldItem;
             bool hasItem = item != ItemType.None;
-            bool scytheActive = GameManager.Instance.heldRelic == RelicType.Scythe;
+            scytheActive = GameManager.Instance.heldRelic == RelicType.Scythe;
 
             emptyMarker.SetActive(!hasItem);
             disableMarker.SetActive(scytheActive);
