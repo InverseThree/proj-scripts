@@ -33,6 +33,27 @@ public class InventorySlotController : MonoBehaviour, IPointerEnterHandler, IPoi
     public GameObject disableMarker;
 
     private void Update()
+using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
+using Fungus;
+
+public class InventorySlotController : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
+{
+    public enum SlotType
+    {
+        Item, 
+        Relic
+    }
+
+    public Button root;
+    public Button iconButton;
+    public SlotType slotType;
+    public Image iconImage;
+    public GameObject emptyMarker;
+    public GameObject disableMarker;
+
+    private void Update()
     {
         if (SayDialog.GetSayDialog().isActiveAndEnabled || MenuDialog.GetMenuDialog().isActiveAndEnabled)
         {
@@ -76,15 +97,19 @@ public class InventorySlotController : MonoBehaviour, IPointerEnterHandler, IPoi
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (slotType == SlotType.Item)
+
+        if (!SayDialog.GetSayDialog().isActiveAndEnabled && !MenuDialog.GetMenuDialog().isActiveAndEnabled)
         {
-            if (GameManager.Instance.heldItem != ItemType.None)
-                TooltipController.Instance.Show(RewardTextLibrary.GetItemName(GameManager.Instance.heldItem), RewardTextLibrary.GetItemDescription(GameManager.Instance.heldItem));
-        }
-        else
-        {
-            if (GameManager.Instance.heldRelic != RelicType.None)
-                TooltipController.Instance.Show(RewardTextLibrary.GetRelicName(GameManager.Instance.heldRelic), RewardTextLibrary.GetRelicDescription(GameManager.Instance.heldRelic));
+            if (slotType == SlotType.Item)
+            {
+                if (GameManager.Instance.heldItem != ItemType.None)
+                    TooltipController.Instance.Show(RewardTextLibrary.GetItemName(GameManager.Instance.heldItem), RewardTextLibrary.GetItemDescription(GameManager.Instance.heldItem));
+            }
+            else
+            {
+                if (GameManager.Instance.heldRelic != RelicType.None)
+                    TooltipController.Instance.Show(RewardTextLibrary.GetRelicName(GameManager.Instance.heldRelic), RewardTextLibrary.GetRelicDescription(GameManager.Instance.heldRelic));
+            }
         }
     }
 
