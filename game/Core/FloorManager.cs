@@ -415,7 +415,7 @@ public class FloorManager : MonoBehaviour
 
         if (clearedFloor % 3 == 0 && clearedFloor != 0)
         {
-            filterItemPool(excludeMirrorOnFinalFloor: GameManager.Instance.currentFloor >= GameManager.Instance.GetFinalFloor());
+            filterItemPool(excludeMirrorOnFinalFloor: GameManager.Instance.currentFloor == (GameManager.Instance.GetFinalFloor() - 1));
             ItemType rewardItem = GetRandomItem();
 
             bool itemDone = false;
