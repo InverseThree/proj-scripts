@@ -315,7 +315,7 @@ public class FloorManager : MonoBehaviour
             yield return null;
         while (SayDialog.GetSayDialog().isActiveAndEnabled || MenuDialog.GetMenuDialog().isActiveAndEnabled);
 
-        filterItemPool(excludeMirrorOnFinalFloor: GameManager.Instance.currentFloor >= GameManager.Instance.GetFinalFloor());
+        filterItemPool(finalFloorUpcoming: GameManager.Instance.currentFloor >= GameManager.Instance.GetFinalFloor());
 		List<ItemType> items = GetItemChoice(3);
 
 		bool done = false;
@@ -415,7 +415,7 @@ public class FloorManager : MonoBehaviour
 
         if (clearedFloor % 3 == 0 && clearedFloor != 0)
         {
-            filterItemPool(excludeMirrorOnFinalFloor: GameManager.Instance.currentFloor == (GameManager.Instance.GetFinalFloor() - 1));
+            filterItemPool(finalFloorUpcoming: GameManager.Instance.currentFloor == (GameManager.Instance.GetFinalFloor() - 1));
             ItemType rewardItem = GetRandomItem();
 
             bool itemDone = false;
@@ -720,13 +720,16 @@ public class FloorManager : MonoBehaviour
         hintLogController.BuildFromPuzzle(currentPuzzle);
     }
 
-    private void filterItemPool(bool excludeMirrorOnFinalFloor)
+    private void filterItemPool(bool finalFloorUpcoming)
     {
-        if (excludeMirrorOnFinalFloor)
-            itemPool.Remove(ItemType.Mirror);
-
         if (GameManager.Instance.modifierState.talismanActive)
             itemPool.Remove(ItemType.Tonic);
+
+        if (GameManager.Instance.currentHealth == 1 && !GameManager.Instance.modifierState.talismanActive)
+            itemPool.Remove(ItemType.Lens);
+
+        if (finalFloorUpcoming)
+            itemPool.Remove(ItemType.Mirror);
 
         foreach (ItemType item in itemPool)
         {
