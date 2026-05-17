@@ -1,4 +1,5 @@
 public static class RewardTextLibrary
+public static class RewardTextLibrary
 {
     public static string GetItemName(ItemType item)
     {
@@ -56,7 +57,7 @@ public static class RewardTextLibrary
             case RelicType.Coin:
                 return "Upon pick up,  add 1 additional inhabitant for future floors. When your health reaches 0 for the first time,  revive into full health instead.";
             case RelicType.Brush:
-                return "Upon pick up,  add 5 additional floors after floor 10.  Future floors have random number of inhabitants instead of set number.";
+                return "Upon pick up,  add 5 additional floors after floor 10.  Future floors have random number of inhabitants,  but can never exceed the original number.";
             case RelicType.Talisman:
                 return "Upon pick up,  set your max health to 1.  The first time you are about to lose health on a floor,  prevent it.";
             case RelicType.Shard:
