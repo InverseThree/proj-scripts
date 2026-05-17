@@ -21,7 +21,10 @@ public class StatementParser
         switch (statement)
         {
             case StatementList.IsKnight:
-                return 4;
+                if (npcCount == 2)
+                    return 4;
+                else
+                    return 5;
 
             case StatementList.IsKnave:
                 if (npcCount == 2)
@@ -178,6 +181,10 @@ public class StatementParser
                     case 3:
                         // "It is not the case that A is a knight."
                         return !IsKnight(a);
+
+                    case 4:
+                        // "A is a knight or B is a knight."
+                        return IsKnight(a) || IsKnight(b);
                 }
                 break;
 
@@ -936,11 +943,17 @@ public class StatementParser
             case StatementList.OnlyKnightSayKnave:
             case StatementList.OnlyKnaveSayKnight:
             case StatementList.OnlyKnaveSayKnave:
-                Add(a);
+                if (variant != 4)
+                    Add(a);
+                else
+                {
+                    Add(a);
+                    Add(b);
+                }
                 break;
 
             case StatementList.IsKnave:
-                if (variant == 0 || variant == 3)
+                if (variant == 0 || variant == 1)
                     Add(a);
                 else
                 {
