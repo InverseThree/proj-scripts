@@ -12,6 +12,21 @@ public class InventorySlotController : MonoBehaviour, IPointerEnterHandler, IPoi
     }
 
     public Button root;
+using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
+using Fungus;
+
+public class InventorySlotController : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
+{
+    public enum SlotType
+    {
+        Item, 
+        Relic
+    }
+
+    public Button root;
+    public Button iconButton;
     public SlotType slotType;
     public Image iconImage;
     public GameObject emptyMarker;
@@ -20,9 +35,15 @@ public class InventorySlotController : MonoBehaviour, IPointerEnterHandler, IPoi
     private void Update()
     {
         if (SayDialog.GetSayDialog().isActiveAndEnabled || MenuDialog.GetMenuDialog().isActiveAndEnabled)
+        {
             root.interactable = false;
+            iconButton.interactable = false;
+        }
         else
+        {
             root.interactable = true;
+            iconButton.interactable = true;
+        }
     }
 
     public void Refresh()
