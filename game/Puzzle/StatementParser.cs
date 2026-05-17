@@ -592,16 +592,19 @@ public class StatementParser
                 switch (variant)
                 {
                     case 0:
-                        return $"I am a knight or {A} is a knight.";
+                        return $"I am a knight or {B} is a knight.";
 
                     case 1:
-                        return $"{A} is a knight.";
+                        return $"I am a knight or {B} is a knave.";
 
                     case 2:
-                        return $"I am a knight or {A} is a knave.";
+                        return $"{A} is a knight.";
 
                     case 3:
                         return $"It is not the case that {A} is a knight.";
+
+                    case 4:
+                        return $"{A} is a knight or {B} is a knight.";
                 }
                 break;
 
@@ -612,13 +615,13 @@ public class StatementParser
                         return $"{A} is a knave.";
 
                     case 1:
-                        return $"{A} is a knave or {B} is a knight.";
+                        return $"It is not the case that {A} is a knave.";
 
                     case 2:
-                        return $"{A} is a knave or {B} is a knave.";
+                        return $"{A} is a knave or {B} is a knight.";
 
                     case 3:
-                        return $"It is not the case that {A} is a knave.";
+                        return $"{A} is a knave or {B} is a knave.";
                 }
                 break;
 
