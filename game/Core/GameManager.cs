@@ -48,7 +48,6 @@ public class GameManager : MonoBehaviour
         runInfoController = FindObjectOfType<RunInfoController>();
         screenShake = FindObjectOfType<ScreenShake>();
 
-        flowchart.SetBooleanVariable("tut", !tutorialCompleted);
         flowchart.SetIntegerVariable("floor", currentFloor);
 
         RefreshHUD();
@@ -109,6 +108,8 @@ public class GameManager : MonoBehaviour
 
     public void RefreshHUD()
     {
+        flowchart.SetBooleanVariable("tut", !tutorialCompleted);
+
         PuzzleData.FloorSpecialState floorState = EnsureFloorState();
 
         if (runInfoController != null)
