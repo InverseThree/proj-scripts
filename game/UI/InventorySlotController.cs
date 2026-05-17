@@ -77,9 +77,13 @@ public class InventorySlotController : MonoBehaviour, IPointerEnterHandler, IPoi
         FloorManager floorManager = FindObjectOfType<FloorManager>();
         if (floorManager == null) return;
 
-        if (slotType == SlotType.Item)
-            floorManager.OnItemSlotClicked();
-        else
-            floorManager.OnRelicSlotClicked();
+
+        if (!SayDialog.GetSayDialog().isActiveAndEnabled && !MenuDialog.GetMenuDialog().isActiveAndEnabled)
+        {
+            if (slotType == SlotType.Item)
+                floorManager.OnItemSlotClicked();
+            else
+                floorManager.OnRelicSlotClicked();
+        }
     }
 }
