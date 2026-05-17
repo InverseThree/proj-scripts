@@ -16,7 +16,7 @@ Exactly one of us is a knight/knave.
 Exactly two of us are knights/knaves. (not available for floors w/ only 2 npcs)<br/>
 Only a knight/knave would say P's a knight/knave.<br/>
 Either I'm/P's a knight/knave or Q's a knight/knave, but not both.<br/>
-Neither I/P nor Q is a knight/knave.<br/>
+Neither I/P nor Q are knights/knaves.<br/>
 I/P and Q have the same/different role.<br/>
 P's a knight/knave when Q's a knight/knave.
 ##### hard pool
@@ -34,7 +34,7 @@ fix a bug where clicking the answerpanel toggle button doesn't show the statemen
 fix a bug where u can still click on the relic slot or item slot when dialog is playing<br/>
 fix a bug where the tutorial for the minigame would play again when u chose the 1st option during ur conversation w/ Conti on floor 1
 #### behaviour change<br/>
-now u can no longer see an item that is the same as ur current held item<br/>
+now u can no longer get an item that is the same as ur current held item<br/>
 now u can no longer get tonic when u have talisman<br/>
 now u can no longer get lens if u only have 1 health left w/o having talisman<br/>
 now u can no long get mirror as ur floor 9 item reward unless u have brush<br/>
@@ -51,8 +51,8 @@ update the tutorial for the chapters<br/>
 now players can open the connectives list and truth tables list for each connectives in the tutorial chapters<br/>
 update the tutorial for the minigame<br/>
 fix the grammar for the "neither… nor…" statements<br/>
-add an extra space after every punctuation for in-game sentences since it looked like there's no space after the punctuation when there's only 1 space due to the font<br/>
-add 2 extra variants about disjunction for the IsKnave statement<br/>
+add an extra 'space' after every punctuation for in-game sentences since it looked like there's no 'space' after the punctuation even when it's there due to the font<br/>
+add 2 extra variants about disjunction for the 'IsKnave' statement<br/>
 change statement type 'ExactlyOneIsKnight' and statement type 'ExactlyOneIsKnave' to 'ExactlyXAreKnights' and 'ExactlyXAreKnaves'<br/>
 add statement type: 'HalfAreKnights', 'HalfAreKnaves', 'CouldSayKnight', 'CouldSayKnight', 'KnightWhenKnight', 'KnightWhenKnave', 'KnaveWhenKnight', 'KnaveWhenKnave', 'KnightNecessaryForKnight', 'KnightNecessaryForKnave', 'KnaveNecessaryForKnight', and 'KnaveNecessaryForKnave'
 
