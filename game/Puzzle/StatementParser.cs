@@ -710,7 +710,7 @@ public class StatementParser
                         return $"Either {A} is a knight or {B} is a knight, but not both.";
 
                     case 2:
-                        return $"Neither {A} nor {B} is a knight.";
+                        return $"Neither {A} nor {B} are knights.";
                 }
                 break;
 
@@ -718,9 +718,9 @@ public class StatementParser
                 switch (variant)
                 {
                     case 0:
-                        return $"Neither I nor {B} is a knave.";
+                        return $"Neither I nor {B} are knaves.";
                     case 1:
-                        return $"Neither {A} nor {B} is a knave.";
+                        return $"Neither {A} nor {B} are knaves.";
                     case 2:
                         return $"Either {A} is a knave or {B} is a knave, but not both.";
                 }
