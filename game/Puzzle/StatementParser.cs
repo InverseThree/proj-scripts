@@ -21,9 +21,9 @@ public class StatementParser
         switch (statement)
         {
             case StatementList.IsKnight:
+            case StatementList.IsKnave:
                 return 4;
 
-            case StatementList.IsKnave:
             case StatementList.HalfAreKnights:
             case StatementList.HalfAreKnaves:
                 return 2;
@@ -184,6 +184,14 @@ public class StatementParser
                         return IsKnave(a);
 
                     case 1:
+                        // "A is a knave or B is a knight."
+                        return IsKnave(a) || IsKnight(b);
+
+                    case 2:
+                        // "A is a knave or B is a knave."
+                        return IsKnave(a) || IsKnave(b);
+
+                    case 3:
                         // "It is not the case that A is a knave."
                         return !IsKnave(a);
                 }
@@ -592,6 +600,12 @@ public class StatementParser
                         return $"{A} is a knave.";
 
                     case 1:
+                        return $"{A} is a knave or {B} is a knight.";
+
+                    case 2:
+                        return $"{A} is a knave or {B} is a knave.";
+
+                    case 3:
                         return $"It is not the case that {A} is a knave.";
                 }
                 break;
@@ -913,12 +927,21 @@ public class StatementParser
         switch (statement)
         {
             case StatementList.IsKnight:
-            case StatementList.IsKnave:
             case StatementList.OnlyKnightSayKnight:
             case StatementList.OnlyKnightSayKnave:
             case StatementList.OnlyKnaveSayKnight:
             case StatementList.OnlyKnaveSayKnave:
                 Add(a);
+                break;
+
+            case StatementList.IsKnave:
+                if (variant == 0 || variant == 3)
+                    Add(a);
+                else
+                {
+                    Add(a);
+                    Add(b);
+                }
                 break;
 
             case StatementList.CouldSayKnight:
