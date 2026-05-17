@@ -275,7 +275,7 @@ public class StatementParser
                         return SameRole(a, selfIndex) || IsPeasant(a);
                     case 1:
                         // "A could say that B is a knight."
-                        return SameRole(a, b) || IsPeasant(a);
+                        return (SameRole(a, b) || (IsKnave(a) && IsPeasant(b))) || IsPeasant(a);
                 }
                 break;
 
@@ -287,7 +287,7 @@ public class StatementParser
                         return !SameRole(a, selfIndex) || IsPeasant(a);
                     case 1:
                         // "A could say that B is a knave."
-                        return !SameRole(a, b) || IsPeasant(a);
+                        return (!SameRole(a, b) && !(IsKnight(a) && IsPeasant(b))) || IsPeasant(a);
                 }
                 break;
 
