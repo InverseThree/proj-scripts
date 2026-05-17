@@ -21,8 +21,13 @@ public class StatementParser
         switch (statement)
         {
             case StatementList.IsKnight:
-            case StatementList.IsKnave:
                 return 4;
+
+            case StatementList.IsKnave:
+                if (npcCount == 2)
+                    return 2;
+                else
+                    return 4;
 
             case StatementList.HalfAreKnights:
             case StatementList.HalfAreKnaves:
@@ -184,16 +189,16 @@ public class StatementParser
                         return IsKnave(a);
 
                     case 1:
+                        // "It is not the case that A is a knave."
+                        return !IsKnave(a);
+
+                    case 2:
                         // "A is a knave or B is a knight."
                         return IsKnave(a) || IsKnight(b);
 
-                    case 2:
+                    case 3:
                         // "A is a knave or B is a knave."
                         return IsKnave(a) || IsKnave(b);
-
-                    case 3:
-                        // "It is not the case that A is a knave."
-                        return !IsKnave(a);
                 }
                 break;
 
