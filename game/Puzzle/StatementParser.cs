@@ -167,16 +167,16 @@ public class StatementParser
                 switch (variant)
                 {
                     case 0:
-                        // "I am a knight or A is a knight."
-                        return IsKnight(selfIndex) || IsKnight(a);
+                        // "I am a knight or B is a knight."
+                        return IsKnight(selfIndex) || IsKnight(b);
 
                     case 1:
-                        // "A is a knight."
-                        return IsKnight(a);
+                        // "I am a knight or B is a knave."
+                        return IsKnight(selfIndex) || IsKnave(b);
 
                     case 2:
-                        // "I am a knight or A is a knave."
-                        return IsKnight(selfIndex) || IsKnave(a);
+                        // "A is a knight."
+                        return IsKnight(a);
 
                     case 3:
                         // "It is not the case that A is a knight."
@@ -292,7 +292,7 @@ public class StatementParser
                 {
                     case 0:
                         // "A could say that I am a knight."
-                        return SameRole(a, selfIndex) || IsPeasant(a);
+                        return (SameRole(a, selfIndex) || (IsKnave(a) && IsPeasant(selfIndex))) || IsPeasant(a);
                     case 1:
                         // "A could say that B is a knight."
                         return (SameRole(a, b) || (IsKnave(a) && IsPeasant(b))) || IsPeasant(a);
@@ -304,7 +304,7 @@ public class StatementParser
                 {
                     case 0:
                         // "A could say that I am a knave."
-                        return !SameRole(a, selfIndex) || IsPeasant(a);
+                        return (!SameRole(a, selfIndex) && !(IsKnight(a) && IsPeasant(selfIndex))) || IsPeasant(a);
                     case 1:
                         // "A could say that B is a knave."
                         return (!SameRole(a, b) && !(IsKnight(a) && IsPeasant(b))) || IsPeasant(a);
@@ -939,11 +939,9 @@ public class StatementParser
         switch (statement)
         {
             case StatementList.IsKnight:
-            case StatementList.OnlyKnightSayKnight:
-            case StatementList.OnlyKnightSayKnave:
-            case StatementList.OnlyKnaveSayKnight:
-            case StatementList.OnlyKnaveSayKnave:
-                if (variant != 4)
+                if (variant == 0 || variant == 1)
+                    Add(b);
+                else if (variant == 2 || variant == 3)
                     Add(a);
                 else
                 {
@@ -962,6 +960,13 @@ public class StatementParser
                 }
                 break;
 
+            case StatementList.OnlyKnightSayKnight:
+            case StatementList.OnlyKnightSayKnave:
+            case StatementList.OnlyKnaveSayKnight:
+            case StatementList.OnlyKnaveSayKnave:
+                Add(a);
+                break;
+
             case StatementList.CouldSayKnight:
             case StatementList.CouldSayKnave:
                 if (variant == 0)
@@ -974,35 +979,8 @@ public class StatementParser
                 break;
 
             case StatementList.BothAreKnights:
-                if (variant == 0)
-                    Add(b);
-                else
-                {
-                    Add(a);
-                    Add(b);
-                }
-                break;
-
             case StatementList.BothAreKnaves:
-                if (variant == 0)
-                    Add(b);
-                else
-                {
-                    Add(a);
-                    Add(b);
-                }
-                break;
-
             case StatementList.EitherKnightOrKnight:
-                if (variant == 0)
-                    Add(b);
-                else
-                {
-                    Add(a);
-                    Add(b);
-                }
-                break;
-
             case StatementList.EitherKnaveOrKnave:
                 if (variant == 0)
                     Add(b);
