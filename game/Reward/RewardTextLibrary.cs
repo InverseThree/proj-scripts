@@ -25,11 +25,11 @@ public static class RewardTextLibrary
             case ItemType.Lens:
                 return "Lose 1 health to reveal a random inhabitant's identity on this floor.";
             case ItemType.Scroll:
-                return "Reveal the number of either knights or knaves on this floor, but you don't know which.";
+                return "Reveal the number of either knights or knaves on this floor,  but you don't know which.";
             case ItemType.Mirror:
                 return "Reveal which 2 random inhabitants have the same identity on the next floor.";
             case ItemType.Hourglass:
-                return "Reset the state of this floor. (inhabitants might have different identities and statements!)";
+                return "Reset the state of this floor.  (inhabitants might have different identities and statements!)";
             default:
                 return "";
         }
@@ -54,17 +54,17 @@ public static class RewardTextLibrary
         switch (relic)
         {
             case RelicType.Coin:
-                return "Upon pick up, add 1 additional inhabitant for future floors. When your health reaches 0 for the first time, revive into full health instead.";
+                return "Upon pick up,  add 1 additional inhabitant for future floors. When your health reaches 0 for the first time,  revive into full health instead.";
             case RelicType.Brush:
-                return "Upon pick up, add 5 additional floors after floor 10. Future floors have random number of inhabitants instead of set number.";
+                return "Upon pick up,  add 5 additional floors after floor 10.  Future floors have random number of inhabitants instead of set number.";
             case RelicType.Talisman:
-                return "Upon pick up, set your max health to 1. The first time you are about to lose health on a floor, prevent it.";
+                return "Upon pick up,  set your max health to 1.  The first time you are about to lose health on a floor,  prevent it.";
             case RelicType.Shard:
-                return "Upon pick up, you now lose 1 health for each incorrect guess in your submission instead. At the start of each floor, choose 1 out of 3 random items to get.";
+                return "Upon pick up,  you now lose 1 health for each incorrect guess in your submission instead.  At the start of each floor,  choose 1 out of 3 random items to get.";
             case RelicType.Scythe:
-                return "Upon pick up, lose 1 item slot. Once per floor, you may kill any number of inhabitants to create new ones in their places. (with potentially different identities and statements!)";
+                return "Upon pick up,  lose 1 item slot. Once per floor,  you may kill any number of inhabitants to create new ones in their places.  (with potentially different identities and statements!)";
             case RelicType.Lamp:
-                return "Upon pick up, hide the names of other inhabitants mentioned in a random inhabitant's statement for future floors. You now have 3 chances in total to make 1 of the following effects come true:\n• Reveal the identity of an inhabitant of your choice on this floor (can only be wished once).\n• Reveal whether the identity of 2 inhabitants of your choice is the same or not on this floor (can only be wished twice).\n• Reveal the number of knights and knaves on this floor (can be wished thrice).";
+                return "Upon pick up,  hide the names of other inhabitants mentioned in a random inhabitant's statement for future floors.  You now have 3 chances in total to make 1 of the following effects come true:\n• Reveal the identity of an inhabitant of your choice on this floor  (can only be wished once).\n• Reveal whether the identity of 2 inhabitants of your choice is the same or not on this floor  (can only be wished twice).\n• Reveal the number of knights and knaves on this floor  (can be wished thrice).";
             default:
                 return "";
         }

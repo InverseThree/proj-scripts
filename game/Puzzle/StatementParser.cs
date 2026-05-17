@@ -718,10 +718,10 @@ public class StatementParser
                 switch (variant)
                 {
                     case 0:
-                        return $"Either I am a knight or {B} is a knight, but not both.";
+                        return $"Either I am a knight or {B} is a knight,  but not both.";
 
                     case 1:
-                        return $"Either {A} is a knight or {B} is a knight, but not both.";
+                        return $"Either {A} is a knight or {B} is a knight,  but not both.";
 
                     case 2:
                         return $"Neither {A} nor {B} are knights.";
@@ -736,7 +736,7 @@ public class StatementParser
                     case 1:
                         return $"Neither {A} nor {B} are knaves.";
                     case 2:
-                        return $"Either {A} is a knave or {B} is a knave, but not both.";
+                        return $"Either {A} is a knave or {B} is a knave,  but not both.";
                 }
                 break;
 
@@ -744,16 +744,16 @@ public class StatementParser
                 switch (variant)
                 {
                     case 0:
-                        return $"Either I am a knight or {B} is a knave, but not both.";
+                        return $"Either I am a knight or {B} is a knave,  but not both.";
 
                     case 1:
-                        return $"Either {A} is a knave or I am a knight, but not both.";
+                        return $"Either {A} is a knave or I am a knight,  but not both.";
 
                     case 2:
-                        return $"Either {A} is a knight or {B} is a knave, but not both.";
+                        return $"Either {A} is a knight or {B} is a knave,  but not both.";
 
                     case 3:
-                        return $"Either {A} is a knave or {B} is a knight, but not both.";
+                        return $"Either {A} is a knave or {B} is a knight,  but not both.";
                 }
                 break;
 
@@ -784,10 +784,10 @@ public class StatementParser
                         return $"{A} is a knight unless {B} is a knight.";
 
                     case 2:
-                        return $"{A} is a knight when {B} is a knight, and vice versa.";
+                        return $"{A} is a knight when {B} is a knight,  and vice versa.";
 
                     case 3:
-                        return $"{A} is a knight unless {B} is a knight, and vice versa.";
+                        return $"{A} is a knight unless {B} is a knight,  and vice versa.";
                 }
                 break;
 
@@ -801,10 +801,10 @@ public class StatementParser
                         return $"{A} is a knight unless {B} is a knave.";
 
                     case 2:
-                        return $"{A} is a knight when {B} is a knave, and vice versa.";
+                        return $"{A} is a knight when {B} is a knave,  and vice versa.";
 
                     case 3:
-                        return $"{A} is a knight unless {B} is a knave, and vice versa.";
+                        return $"{A} is a knight unless {B} is a knave,  and vice versa.";
                 }
                 break;
 
@@ -818,10 +818,10 @@ public class StatementParser
                         return $"{A} is a knave unless {B} is a knight.";
 
                     case 2:
-                        return $"{A} is a knave when {B} is a knight, and vice versa.";
+                        return $"{A} is a knave when {B} is a knight,  and vice versa.";
 
                     case 3:
-                        return $"{A} is a knave unless {B} is a knight, and vice versa.";
+                        return $"{A} is a knave unless {B} is a knight,  and vice versa.";
                 }
                 break;
 
@@ -835,10 +835,10 @@ public class StatementParser
                         return $"{A} is a knave unless {B} is a knave.";
 
                     case 2:
-                        return $"{A} is a knave when {B} is a knave, and vice versa.";
+                        return $"{A} is a knave when {B} is a knave,  and vice versa.";
 
                     case 3:
-                        return $"{A} is a knave unless {B} is a knave, and vice versa.";
+                        return $"{A} is a knave unless {B} is a knave,  and vice versa.";
                 }
                 break;
 
