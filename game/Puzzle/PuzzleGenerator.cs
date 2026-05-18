@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -40,6 +41,7 @@ public class PuzzleGenerator
     {
         RunModifierState mods = GameManager.Instance.modifierState;
 
+        statementPool.Clear();
         foreach (StatementList statement in Enum.GetValues(typeof(StatementList)))
             statementPool.Add(statement);
 
@@ -64,6 +66,9 @@ public class PuzzleGenerator
             floorState = new PuzzleData.FloorSpecialState(),
             hints = new List<string>()
         };
+
+        if (scytheUsed)
+            puzzle.floorState = lastPuzzle.floorState;
 
         for (int i = 0; i < npcCount; i++)
             puzzle.playerGuesses[i] = 0;
@@ -132,7 +137,15 @@ public class PuzzleGenerator
             }
         }
 
-        GameManager.Instance.currentPuzzle = Generate(puzzle.floorIndex, rng, true, indicesList);
+        PuzzleData newPuzzle = Generate(puzzle.floorIndex, rng, true, indicesList);
+
+        GameManager.Instance.currentPuzzle = newPuzzle;
+
+        PuzzleData.FloorSpecialState state = newPuzzle.floorState;
+        state.scytheKillCount += selectedIndices.Count;
+        state.scytheUsed = true;
+        if (state.scytheKillCount == puzzle.npcCount)
+            state.scytheUsedUp = true;
 
         return true;
     }

@@ -166,7 +166,18 @@ public class FloorManager : MonoBehaviour
                 }
 			}
 			else
+            {
 				spawn = availableSpawns[GameManager.Instance.npcSpawnedIndices[i]];
+
+                for (int j = 0; j < npcSpawnPoints.Length; j++)
+                {
+                    if (spawn == npcSpawnPoints[j])
+                    {
+                        spawnedIndex = j;
+                        break;
+                    }
+                }
+            }
 
             GameObject npc = Instantiate(npcPrefab, spawn.position, spawn.rotation);
 			Debug.Log($"Npc{i}");
@@ -460,9 +471,12 @@ public class FloorManager : MonoBehaviour
         switch (GameManager.Instance.heldRelic)
         {
             case RelicType.Scythe:
-                if (currentPuzzle.floorState.scytheUsed)
+                PuzzleData.FloorSpecialState state = currentPuzzle.floorState;
+
+                if (state.scytheUsedUp)
                 {
-                    rewardPanelController.ShowMessage(false, "Held Relic", "This relic has already been used on this floor.");
+                    Debug.Log($"npc count: {currentPuzzle.npcCount}");
+                    rewardPanelController.ShowMessage(false, "Held Relic", "You can't kill more inhabitants on this floor.");
                     return;
                 }
 
@@ -475,13 +489,10 @@ public class FloorManager : MonoBehaviour
                         if (success)
                         {
 						    for (int i = 0; i < currentPuzzle.npcCount; i++)
-						    {
 						        Debug.Log($"POST-REROLL ROLE {i}: {currentPuzzle.role[i]}");
-						    }
-						    currentPuzzle.floorState.scytheUsed = true;
 
 						    currentPuzzle.hints.Clear();
-						    currentPuzzle.floorState.ClearDerivedFloorHints();
+						    state.ClearDerivedFloorHints();
 
 						    ClearSpawnedNPCs();
 
