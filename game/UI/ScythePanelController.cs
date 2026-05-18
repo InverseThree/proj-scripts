@@ -9,6 +9,7 @@ public class ScythePanelController : MonoBehaviour
 {
     public GameObject root;
     public Toggle[] toggles;
+    public TextMeshProUGUI info;
     public TextMeshProUGUI[] labels;
     public EventTrigger[] triggers;
     public Button confirmButton;
@@ -17,19 +18,31 @@ public class ScythePanelController : MonoBehaviour
 
     public FloorManager floorManager;
 
+    private PuzzleData currentPuzzle;
+
     private Action<List<int>> callback;
+
+    private int killLeft = 0;
 
     private void Start()
     {
         root.SetActive(false);
 
         floorManager = GameObject.FindGameObjectWithTag("GameController").GetComponent<FloorManager>();
+        currentPuzzle = GameManager.Instance.currentPuzzle;
+
+        for (int i = 0; i < toggles.Length; i++)
+            toggles[i].onValueChanged.AddListener(delegate { SetConfirmButton(); });
     }
 
     public void Show(Action<List<int>> onConfirm)
     {
         callback = onConfirm;
         root.SetActive(true);
+
+        killLeft = currentPuzzle.npcCount - currentPuzzle.floorState.scytheKillCount;
+
+        info.text = $"You can still KILL {killLeft} inhabitants on this floor";
 
         for (int i = 0; i < floorManager.spawnedNPCs.Count; i++)
         {
@@ -58,6 +71,7 @@ public class ScythePanelController : MonoBehaviour
 
         confirmButton.onClick.RemoveAllListeners();
         confirmButton.onClick.AddListener(Confirm);
+        confirmButton.interactable = false;
 
         cancelButton.onClick.RemoveAllListeners();
         cancelButton.onClick.AddListener(() => root.SetActive(false));
@@ -80,9 +94,38 @@ public class ScythePanelController : MonoBehaviour
         {
             if (toggles[i].gameObject.activeSelf && toggles[i].isOn)
                 selected.Add(i);
+
+            toggles[i].isOn = false;
         }
 
         callback?.Invoke(selected);
         root.SetActive(false);
+    }
+
+    private void SetConfirmButton()
+    {
+        int toggleOnCount = 0;
+
+        for (int i = 0; i < toggles.Length; i++)
+        {
+            if (toggles[i].isOn)
+                toggleOnCount++;
+        }
+
+        if (killLeft < toggleOnCount)
+            confirmButton.interactable = false;
+        else
+        {
+            for (int i = 0; i < toggles.Length; i++)
+            {
+                if (toggles[i].isOn)
+                {
+                    confirmButton.interactable = true;
+                    return;
+                }
+            }
+
+            confirmButton.interactable = false;
+        }
     }
 }
