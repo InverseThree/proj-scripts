@@ -1,10 +1,44 @@
 scripts for [this](https://github.com/InverseThree/logicAppProj), don't steal w/o my permission
 
 # patch notes
+## V1.1.1 (2026 May 21)
+### balance changes<br/>
+#### Brush of Chaos
+old: "Upon pick up, add 5 additional floors after floor 10. Future floors have random number of inhabitants instead of set number."<br/>
+new: "Upon pick up, add 5 additional floors after floor 10. At the start of each floor, randomize the number of inhabitants and give this relic an effect of another relic correspondingly."
+##### brush effects (non-pick-up effect of other relics)
+2 npcs: coin <br/>
+3 npcs: talisman<br/>
+4 npcs: shard<br/>
+5 npcs: scythe<br/>
+6 npcs: lamp<br/>
+#### Scythe of Origination
+old: "Upon pick up, lose 1 item slot. Once per floor, you may kill any number of inhabitants to create new ones in their places. (with potentially different identities and statements!)"<br/>
+new: "Upon pick up, lose 1 item slot. You may now kill any number of inhabitants to create new ones in their places repeatedly until your kill count on a floor reaches the floor's inhabitants count. (Inhabitants might have different identities and statements!)"
+### bug fixes<br/>
+fix a bug where npcs could say 'P is a knave or P is a knight/knave' from patch V1.1
+### UI improvement<br/>
+change the ui for the scythe panel to match w/ its new effects<br/>
+add sprites for brush to match different effects<br/>
+update the ui for the tooltip to make it look better
+### other changes<br/>
+add new variant "P is a knight or Q is a knight" for statement type 'IsKnight'<br/>
+remove 2 variants for statement type 'EitherKnightOrKnave' since they were essentially the same as other variants
+### rephrase the description for the following items and relics<br/>
+#### Hourglass of Infinity
+old: "Reset the state of …"<br/>
+new: "Rewind the state of …"
+#### Shard of Falsehood
+old: "Upon pick up, you now lose 1 health for each incorrect guess in your submission instead. At the start …" <br/>
+new: "Upon pick up, set your health loss to the number of mismatch identities instead of 1 for future incorrect answers. At the start …"
+#### Lamp of Oracle
+old: "Upon pick up, hide the names of other inhabitants mentioned in a random inhabitant's statement for future floors. You now have …"<br/>
+new: "Upon pick up, hide all names mentioned in a random inhabitant's statement for future floors. You now have …"
+
 ## V1.1 (2026 May 17)
 ### major update<br/>
 #### summary
-add hints for the tutorial chapters so it's friendlier for beginner to pass the quizzes. also adjust the statement pool with new statements and refined statements' difficulty level (plus other miscellaneous changes)
+add hints for the tutorial chapters so it's friendlier for beginner to pass the quizzes. also adjust the statement pool with new statements and refined statements' difficulty level since i find the old ver. being too easy (even tho i still have close to 100% winrate in the new patch), plus other miscellaneous changes
 #### new statements pool for the mini-game (npcs can't refer themselves as kanve)
 ##### easy pool
 P's/isn't a knight/knave.<br/>
@@ -54,7 +88,7 @@ fix the grammar for the "neither… nor…" statements<br/>
 add an extra 'space' after every punctuation for in-game sentences since it looked like there's no 'space' after the punctuation even when it's there due to the font<br/>
 add 2 extra variants about disjunction for the 'IsKnave' statement<br/>
 change statement type 'ExactlyOneIsKnight' and statement type 'ExactlyOneIsKnave' to 'ExactlyXAreKnights' and 'ExactlyXAreKnaves'<br/>
-add statement type: 'HalfAreKnights', 'HalfAreKnaves', 'CouldSayKnight', 'CouldSayKnight', 'KnightWhenKnight', 'KnightWhenKnave', 'KnaveWhenKnight', 'KnaveWhenKnave', 'KnightNecessaryForKnight', 'KnightNecessaryForKnave', 'KnaveNecessaryForKnight', and 'KnaveNecessaryForKnave'
+add statement type: 'HalfAreKnights', 'HalfAreKnaves', 'CouldSayKnight', 'CouldSayKnave', 'KnightWhenKnight', 'KnightWhenKnave', 'KnaveWhenKnight', 'KnaveWhenKnave', 'KnightNecessaryForKnight', 'KnightNecessaryForKnave', 'KnaveNecessaryForKnight', and 'KnaveNecessaryForKnave'
 
 ## V1.0.3 (2026 May 15)
 ### bug fixes<br/>
