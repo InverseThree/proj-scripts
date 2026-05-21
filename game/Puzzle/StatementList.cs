@@ -17,12 +17,12 @@ public enum StatementList
     CouldSayKnight,
     CouldSayKnave,
 
-    BothAreKnights,
-    BothAreKnaves,
-
+    EitherKnightOrKnave,
     EitherKnightOrKnight,
     EitherKnaveOrKnave,
-    EitherKnightOrKnave,
+
+    BothAreKnights,
+    BothAreKnaves,
     RoleSame,
 
     KnightWhenKnight,

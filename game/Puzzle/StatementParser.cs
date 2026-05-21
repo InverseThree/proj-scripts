@@ -53,21 +53,21 @@ public class StatementParser
 
             case StatementList.CouldSayKnight:
             case StatementList.CouldSayKnave:
+            case StatementList.EitherKnightOrKnave:
                 if (npcCount == 2)
                     return 1;
                 else
                     return 2;
 
-            case StatementList.BothAreKnights:
-            case StatementList.BothAreKnaves:
             case StatementList.EitherKnightOrKnight:
             case StatementList.EitherKnaveOrKnave:
+            case StatementList.BothAreKnights:
+            case StatementList.BothAreKnaves:
                 if (npcCount == 2)
                     return 1;
                 else
                     return 3;
 
-            case StatementList.EitherKnightOrKnave:
             case StatementList.RoleSame:
                 if (npcCount == 2)
                     return 2;
@@ -311,37 +311,16 @@ public class StatementParser
                 }
                 break;
 
-            case StatementList.BothAreKnights:
+            case StatementList.EitherKnightOrKnave:
                 switch (variant)
                 {
                     case 0:
-                        // "I and B are both knights."
-                        return IsKnight(selfIndex) && IsKnight(b);
+                        // "Either I am a knight or B is a knave, but not both."
+                        return Xor(IsKnight(selfIndex), IsKnave(b));
 
                     case 1:
-                        // "A and B are both knights."
-                        return IsKnight(a) && IsKnight(b);
-
-                    case 2:
-                        // "It is not the case that both A and B are knights."
-                        return !(IsKnight(a) && IsKnight(b));
-                }
-                break;
-
-            case StatementList.BothAreKnaves:
-                switch (variant)
-                {
-                    case 0:
-                        // "It is not the case that both I and B are knaves."
-                        return !(IsKnave(selfIndex) && IsKnave(b));
-
-                    case 1:
-                        // "It is not the case that both A and B are knaves."
-                        return !(IsKnave(a) && IsKnave(b));
-
-                    case 2:
-                        // "A and B are both knaves."
-                        return IsKnave(a) && IsKnave(b);
+                        // "Either A is a knight or B is a knave, but not both."
+                        return Xor(IsKnight(a), IsKnave(b));
                 }
                 break;
 
@@ -379,24 +358,37 @@ public class StatementParser
                 }
                 break;
 
-            case StatementList.EitherKnightOrKnave:
+            case StatementList.BothAreKnights:
                 switch (variant)
                 {
                     case 0:
-                        // "Either I am a knight or B is a knave, but not both."
-                        return Xor(IsKnight(selfIndex), IsKnave(b));
+                        // "I and B are both knights."
+                        return IsKnight(selfIndex) && IsKnight(b);
 
                     case 1:
-                        // "Either A is a knave or I am a knight, but not both."
-                        return Xor(IsKnave(a), IsKnight(selfIndex));
+                        // "A and B are both knights."
+                        return IsKnight(a) && IsKnight(b);
 
                     case 2:
-                        // "Either A is a knight or B is a knave, but not both."
-                        return Xor(IsKnight(a), IsKnave(b));
+                        // "It is not the case that both A and B are knights."
+                        return !(IsKnight(a) && IsKnight(b));
+                }
+                break;
 
-                    case 3:
-                        // "Either A is a knave or B is a knight, but not both."
-                        return Xor(IsKnave(a), IsKnight(b));
+            case StatementList.BothAreKnaves:
+                switch (variant)
+                {
+                    case 0:
+                        // "It is not the case that both I and B are knaves."
+                        return !(IsKnave(selfIndex) && IsKnave(b));
+
+                    case 1:
+                        // "It is not the case that both A and B are knaves."
+                        return !(IsKnave(a) && IsKnave(b));
+
+                    case 2:
+                        // "A and B are both knaves."
+                        return IsKnave(a) && IsKnave(b);
                 }
                 break;
 
@@ -981,24 +973,13 @@ public class StatementParser
                 }
                 break;
 
-            case StatementList.BothAreKnights:
-            case StatementList.BothAreKnaves:
+            case StatementList.EitherKnightOrKnave:
             case StatementList.EitherKnightOrKnight:
             case StatementList.EitherKnaveOrKnave:
+            case StatementList.BothAreKnights:
+            case StatementList.BothAreKnaves:
                 if (variant == 0)
                     Add(b);
-                else
-                {
-                    Add(a);
-                    Add(b);
-                }
-                break;
-
-            case StatementList.EitherKnightOrKnave:
-                if (variant == 0)
-                    Add(b);
-                else if (variant == 1)
-                    Add(a);
                 else
                 {
                     Add(a);
