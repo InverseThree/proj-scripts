@@ -17,6 +17,7 @@ public class InventorySlotController : MonoBehaviour, IPointerEnterHandler, IPoi
     public Image iconImage;
     public GameObject emptyMarker;
     public GameObject disableMarker;
+    public GameObject brush2ndEffect;
 
     private bool scytheActive = false;
 
@@ -58,8 +59,11 @@ public class InventorySlotController : MonoBehaviour, IPointerEnterHandler, IPoi
             emptyMarker.SetActive(!hasRelic);
             iconImage.enabled = hasRelic;
 
-            if (hasRelic)
+            if (relic == RelicType.Brush)
+                iconImage.sprite = RewardSpriteLibrary.Instance.GetBrushSprite(GameManager.Instance.currentPuzzle.floorState.brushEffect);
+            else if (hasRelic)
                 iconImage.sprite = RewardSpriteLibrary.Instance.GetRelicSprite(relic);
+
         }
     }
 

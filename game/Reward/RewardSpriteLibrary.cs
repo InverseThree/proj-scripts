@@ -20,8 +20,16 @@ public class RewardSpriteLibrary : MonoBehaviour
         public Sprite sprite;
     }
 
+    [Serializable]
+    public class BrushSpriteEntry
+    {
+        public int brushEffect;
+        public Sprite sprite;
+    }
+
     public List<ItemSpriteEntry> itemSprites = new List<ItemSpriteEntry>();
     public List<RelicSpriteEntry> relicSprites = new List<RelicSpriteEntry>();
+    public List<BrushSpriteEntry> brushSprites = new List<BrushSpriteEntry>();
 
     private void Awake()
     {
@@ -41,6 +49,14 @@ public class RewardSpriteLibrary : MonoBehaviour
         for (int i = 0; i < relicSprites.Count; i++)
             if (relicSprites[i].relic == relic)
                 return relicSprites[i].sprite;
+        return null;
+    }
+
+    public Sprite GetBrushSprite(int brushEffect)
+    {
+        for (int i = 0; i < brushSprites.Count; i++)
+            if (brushSprites[i].brushEffect == brushEffect)
+                return brushSprites[i].sprite;
         return null;
     }
 }
