@@ -96,6 +96,9 @@ public class FloorManager : MonoBehaviour
 		ApplyAppearances(puzzle);
 		InitializeFloor(puzzle);
 
+        if (GameManager.Instance.currentFloor >= 10)
+            puzzle.hints.Add("Floor Rule:  Exactly one inhabitant is a peasant.");
+
 		ModifyDisplayText(puzzle);
 		hintLogController.BuildFromPuzzle(puzzle);
 
