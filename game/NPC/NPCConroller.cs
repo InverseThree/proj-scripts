@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class NPCController: MonoBehaviour
 {
-    [Header("Optional Visual References")]
     public NPCAppearance appearance;
 
     private FloorManager floorManager;
