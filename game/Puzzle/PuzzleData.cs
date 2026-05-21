@@ -68,6 +68,8 @@ public class PuzzleData
         public int mirrorHintA = -1;
         public int mirrorHintB = -1;
 
+        public int brushEffect = 1;
+
         public int scytheKillCount = 0;
 
         public int lampHiddenIndex = -1;

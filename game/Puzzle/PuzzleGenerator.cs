@@ -45,8 +45,10 @@ public class PuzzleGenerator
         foreach (StatementList statement in Enum.GetValues(typeof(StatementList)))
             statementPool.Add(statement);
 
-        if (mods.brushActive)
-            npcCount = floorIndex <= 3 ? 2 : (floorIndex <= 6 ? rng.Next(2, 4) : (floorIndex <= 9 ? rng.Next(2, 5) : rng.Next(2, 6)));
+        if (mods.brushActive && !scytheUsed)
+            npcCount = rng.Next(2, 7);
+        else if (mods.brushActive && scytheUsed)
+            npcCount = lastPuzzle.npcCount;
         else
             npcCount = floorIndex <= 3 ? 2 : floorIndex <= 6 ? 3 : floorIndex <= 9 ? 4 : 5;
 
@@ -78,7 +80,7 @@ public class PuzzleGenerator
             do
             {
                 GenerateSolutions(puzzle, rng, scytheUsed, selectedIndices);
-                GenerateStatements(puzzle, floorIndex, rng);
+                GenerateStatements(puzzle, floorIndex, rng, scytheUsed);
 
                 for (int i = 0; i < puzzle.role.Length; i++)
                 {
@@ -161,9 +163,18 @@ public class PuzzleGenerator
         }
     }
 
-    private void GenerateStatements(PuzzleData puzzle, int floor, System.Random rng)
+    private void GenerateStatements(PuzzleData puzzle, int floor, System.Random rng, bool scytheUsed)
     {
         usedStatementVariants.Clear();
+
+        if (scytheUsed)
+        {
+            for (int i = 0; i < puzzle.npcCount; i++)
+            {
+                if (puzzle.role[i] == Role.None)
+                    usedStatementVariants.Add(new StatementKey(lastPuzzle.npcInfo[i].statement.statement, lastPuzzle.npcInfo[i].statement.variant));
+            }
+        }
 
         var probs = PuzzleData.DifficultyProfile.GetTierProbabilities(floor);
 

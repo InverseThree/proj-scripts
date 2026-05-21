@@ -79,6 +79,7 @@ public class RewardPanelController : MonoBehaviour
 
     public void ShowMessage(bool isItem, string title, string message)
     {
+        Hide();
         selectable = false;
         root.SetActive(true);
         rewards[0].gameObject.transform.parent.gameObject.SetActive(true);
@@ -97,6 +98,7 @@ public class RewardPanelController : MonoBehaviour
 
     public void ShowUseItemPrompt(ItemType item, Action<bool> callback)
     {
+        Hide();
         selectable = false;
         root.SetActive(true);
 
@@ -142,6 +144,7 @@ public class RewardPanelController : MonoBehaviour
 
     public void ShowItemOffer(ItemType item, bool canTake, bool slotFull, Action<ItemOptions> callback)
     {
+        Hide();
         selectable = false;
         root.SetActive(true);
         titleText.text = "Item Obtained";
@@ -189,6 +192,7 @@ public class RewardPanelController : MonoBehaviour
 
     public void ShowItemChoice(List<ItemType> items, bool slotFull, Action<ItemType> callback)
     {
+        Hide();
         selectable = true;
         root.SetActive(true);
         titleText.text = "Choose 1 Item";
@@ -233,6 +237,7 @@ public class RewardPanelController : MonoBehaviour
 
     public void ShowRelicChoice(List<RelicType> relics, Action<RelicType> callback)
     {
+        Hide();
         selectable = true;
         root.SetActive(true);
         titleText.text = "Choose 1 Relic";

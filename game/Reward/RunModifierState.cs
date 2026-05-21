@@ -18,8 +18,8 @@ public class RunModifierState
 
     public bool hasRelic => heldRelic != RelicType.None;
     public bool itemSlotDisabled => heldRelic == RelicType.Scythe;
-    public bool coinActive => heldRelic == RelicType.Coin;
     public bool brushActive => heldRelic == RelicType.Brush;
+    public bool coinActive => heldRelic == RelicType.Coin;
     public bool talismanActive => heldRelic == RelicType.Talisman;
     public bool shardActive => heldRelic == RelicType.Shard;
     public bool scytheActive => heldRelic == RelicType.Scythe;

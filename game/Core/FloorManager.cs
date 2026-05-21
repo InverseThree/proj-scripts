@@ -1,4 +1,4 @@
-using System;
+Zusing System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -99,11 +99,14 @@ public class FloorManager : MonoBehaviour
 		ModifyDisplayText(puzzle);
 		hintLogController.BuildFromPuzzle(puzzle);
 
-		if (GameManager.Instance.modifierState.shardActive && !currentPuzzle.floorState.shardResolved && !GameManager.Instance.rewinded) 
+        if (GameManager.Instance.modifierState.brushActive)
+            currentPuzzle.floorState.brushEffect = currentPuzzle.npcCount;
+
+		if ((GameManager.Instance.modifierState.shardActive || currentPuzzle.floorState.brushEffect == 4) && !currentPuzzle.floorState.shardResolved && !GameManager.Instance.rewinded) 
 			StartCoroutine(ShardActivate());
 
 		GameManager.Instance.rewinded = false;
-
+        GameManager.Instance.RefreshHUD();
         GameManager.Instance.SaveRun();
     }
 
@@ -470,6 +473,14 @@ public class FloorManager : MonoBehaviour
     {
         switch (GameManager.Instance.heldRelic)
         {
+            case RelicType.Brush:
+                if (currentPuzzle.floorState.brushEffect == 5)
+                    goto case RelicType.Scythe;
+                else if (currentPuzzle.floorState.brushEffect == 6)
+                    goto case RelicType.Lamp;
+
+                goto default;
+
             case RelicType.Scythe:
                 PuzzleData.FloorSpecialState state = currentPuzzle.floorState;
 
@@ -623,6 +634,10 @@ public class FloorManager : MonoBehaviour
 
     private IEnumerator Rewind()
     {
+        currentPuzzle.floorState.scytheUsed = false;
+        currentPuzzle.floorState.scytheUsedUp = false;
+        currentPuzzle.floorState.scytheKillCount = 0;
+
         GameManager.Instance.modifierState.lampTotalUsed -= currentPuzzle.floorState.lampWishesSpent;
         GameManager.Instance.modifierState.lampIdentityTotalUsed -= currentPuzzle.floorState.lampIdentitySpent;
         GameManager.Instance.modifierState.lampPairTotalUsed -= currentPuzzle.floorState.lampPairSpent;

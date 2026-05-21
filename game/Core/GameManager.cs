@@ -115,7 +115,7 @@ public class GameManager : MonoBehaviour
         if (runInfoController != null)
             runInfoController.RefreshAll();
 
-        if (modifierState.talismanActive && !floorState.talismanPrevented)
+        if ((modifierState.talismanActive || currentPuzzle.floorState.brushEffect == 3) && !floorState.talismanPrevented)
             runInfoController.SetBarrier(true);
 
         if (floorState.shieldActive)
@@ -203,7 +203,7 @@ public class GameManager : MonoBehaviour
             return false;
         }
 
-        if (modifierState.talismanActive && !floorState.talismanPrevented)
+        if ((modifierState.talismanActive || currentPuzzle.floorState.brushEffect == 3) && !floorState.talismanPrevented)
         {
             floorState.talismanPrevented = true;
             prevented = true;
@@ -216,7 +216,7 @@ public class GameManager : MonoBehaviour
         currentHealth = Mathf.Max(0, currentHealth - amount);
         screenShake.Shake();
 
-        if (currentHealth <= 0 && modifierState.coinActive && !modifierState.coinRevived)
+        if (currentHealth <= 0 && (modifierState.coinActive || currentPuzzle.floorState.brushEffect == 2) && !modifierState.coinRevived)
         {
             modifierState.coinRevived = true;
             currentHealth = currentMaxHealth;
