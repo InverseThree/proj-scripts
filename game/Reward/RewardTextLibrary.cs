@@ -29,7 +29,7 @@ public static class RewardTextLibrary
             case ItemType.Mirror:
                 return "Reveal which 2 random inhabitants have the same identity on the next floor.";
             case ItemType.Hourglass:
-                return "Reset the state of this floor.\n(Inhabitants might have different identities and statements!)";
+                return "Rewind the state of this floor.\n(Inhabitants might have different identities and statements!)";
             default:
                 return "";
         }
@@ -84,7 +84,7 @@ public static class RewardTextLibrary
             case RelicType.Scythe:
                 return "Upon pick up,  lose 1 item slot.  You may now kill any number of inhabitants to create new ones in their places repeatedly until your kill count on a floor reaches the floor's inhabitants count.\n(Inhabitants might have different identities and statements!)";
             case RelicType.Lamp:
-                return "Upon pick up,  hide the names of other inhabitants mentioned in a random inhabitant's statement for future floors.  You now have 3 chances in total to make 1 of the following effects come true:\n• Reveal the identity of an inhabitant of your choice on this floor  (can only be wished once).\n• Reveal whether the identity of 2 inhabitants of your choice is the same or not on this floor  (can only be wished twice).\n• Reveal the number of knights and knaves on this floor  (can be wished thrice).";
+                return "Upon pick up,  hide all names mentioned in a random inhabitant's statement for future floors.  You now have 3 chances in total to make 1 of the following effects come true:\n• Reveal the identity of an inhabitant of your choice on this floor  (can only be wished once).\n• Reveal whether the identity of 2 inhabitants of your choice is the same or not on this floor  (can only be wished twice).\n• Reveal the number of knights and knaves on this floor  (can be wished thrice).";
             default:
                 return "";
         }
