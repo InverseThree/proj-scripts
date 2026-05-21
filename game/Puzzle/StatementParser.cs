@@ -693,31 +693,14 @@ public class StatementParser
                 }
                 break;
 
-            case StatementList.BothAreKnights:
+            case StatementList.EitherKnightOrKnave:
                 switch (variant)
                 {
                     case 0:
-                        return $"I and {B} are both knights.";
+                        return $"Either I am a knight or {B} is a knave,  but not both.";
 
                     case 1:
-                        return $"{A} and {B} are both knights.";
-
-                    case 2:
-                        return $"It is not the case that both {A} and {B} are knights.";
-                }
-                break;
-
-            case StatementList.BothAreKnaves:
-                switch (variant)
-                {
-                    case 0:
-                        return $"It is not the case that both I and {B} are knaves.";
-
-                    case 1:
-                        return $"It is not the case that both {A} and {B} are knaves.";
-
-                    case 2:
-                        return $"{A} and {B} are both knaves.";
+                        return $"Either {A} is a knight or {B} is a knave,  but not both.";
                 }
                 break;
 
@@ -747,20 +730,31 @@ public class StatementParser
                 }
                 break;
 
-            case StatementList.EitherKnightOrKnave:
+            case StatementList.BothAreKnights:
                 switch (variant)
                 {
                     case 0:
-                        return $"Either I am a knight or {B} is a knave,  but not both.";
+                        return $"I and {B} are both knights.";
 
                     case 1:
-                        return $"Either {A} is a knave or I am a knight,  but not both.";
+                        return $"{A} and {B} are both knights.";
 
                     case 2:
-                        return $"Either {A} is a knight or {B} is a knave,  but not both.";
+                        return $"It is not the case that both {A} and {B} are knights.";
+                }
+                break;
 
-                    case 3:
-                        return $"Either {A} is a knave or {B} is a knight,  but not both.";
+            case StatementList.BothAreKnaves:
+                switch (variant)
+                {
+                    case 0:
+                        return $"It is not the case that both I and {B} are knaves.";
+
+                    case 1:
+                        return $"It is not the case that both {A} and {B} are knaves.";
+
+                    case 2:
+                        return $"{A} and {B} are both knaves.";
                 }
                 break;
 
