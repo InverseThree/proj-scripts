@@ -80,7 +80,7 @@ public static class RewardTextLibrary
             case RelicType.Talisman:
                 return "Upon pick up,  set your max health to 1.  The first time you are about to lose health on a floor,  prevent it.";
             case RelicType.Shard:
-                return "Upon pick up,  you now lose 1 health for each incorrect guess in your submission instead.  At the start of each floor,  choose 1 out of 3 random items to get.";
+                return "Upon pick up,  set your health loss to the number of mismatch identities instead of 1 for future incorrect answers.  At the start of each floor,  choose 1 out of 3 random items to get.";
             case RelicType.Scythe:
                 return "Upon pick up,  lose 1 item slot.  You may now kill any number of inhabitants to create new ones in their places repeatedly until your kill count on a floor reaches the floor's inhabitants count.\n(Inhabitants might have different identities and statements!)";
             case RelicType.Lamp:
