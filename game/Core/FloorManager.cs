@@ -109,10 +109,9 @@ public class FloorManager : MonoBehaviour
         if (GameManager.Instance.modifierState.brushActive)
             currentPuzzle.floorState.brushEffect = currentPuzzle.npcCount;
 
-		if ((GameManager.Instance.modifierState.shardActive || currentPuzzle.floorState.brushEffect == 4) && !currentPuzzle.floorState.shardResolved && !GameManager.Instance.rewinded) 
+		if ((GameManager.Instance.modifierState.shardActive || currentPuzzle.floorState.brushEffect == 4) && !GameManager.Instance.shardResolved) 
 			StartCoroutine(ShardActivate());
 
-		GameManager.Instance.rewinded = false;
         GameManager.Instance.RefreshHUD();
         GameManager.Instance.SaveRun();
     }
@@ -341,6 +340,8 @@ public class FloorManager : MonoBehaviour
             yield return null;
         while (SayDialog.GetSayDialog().isActiveAndEnabled || MenuDialog.GetMenuDialog().isActiveAndEnabled);
 
+        GameManager.Instance.shardResolved = true;
+
         filterItemPool(finalFloorUpcoming: GameManager.Instance.currentFloor >= GameManager.Instance.GetFinalFloor());
 		List<ItemType> items = GetItemChoice(3);
 
@@ -350,7 +351,6 @@ public class FloorManager : MonoBehaviour
 				if (selected != ItemType.None)
 				    GameManager.Instance.GiveItem(selected);
 
-				currentPuzzle.floorState.shardResolved = true;
 				GameManager.Instance.SaveRun();
 				done = true;
 			});
@@ -652,10 +652,6 @@ public class FloorManager : MonoBehaviour
     {
         cleared = true;
 
-        currentPuzzle.floorState.scytheUsed = false;
-        currentPuzzle.floorState.scytheUsedUp = false;
-        currentPuzzle.floorState.scytheKillCount = 0;
-
         GameManager.Instance.modifierState.lampTotalUsed -= currentPuzzle.floorState.lampWishesSpent;
         GameManager.Instance.modifierState.lampIdentityTotalUsed -= currentPuzzle.floorState.lampIdentitySpent;
         GameManager.Instance.modifierState.lampPairTotalUsed -= currentPuzzle.floorState.lampPairSpent;
@@ -667,14 +663,13 @@ public class FloorManager : MonoBehaviour
         GameManager.Instance.modifierState.lampCountTotalUsed = Mathf.Max(0, GameManager.Instance.modifierState.lampCountTotalUsed);
 
         bool mirrorUsed = currentPuzzle.floorState.mirrorHintA >= 0 && currentPuzzle.floorState.mirrorHintB >= 0;
-
         if (mirrorUsed)
             GameManager.Instance.modifierState.mirrorPending = true;
+
 		bool retakeDamage = false;
-		if (currentPuzzle.floorState.talismanPrevented == true)
+		if (currentPuzzle.floorState.talismanPrevented)
 			retakeDamage = true;
 
-		GameManager.Instance.rewinded = true;
 		GameManager.Instance.SaveRun();
 
 		yield return StartCoroutine(LoadFloor());

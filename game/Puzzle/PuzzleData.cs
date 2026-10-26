@@ -61,7 +61,6 @@ public class PuzzleData
         public bool shieldActive = false;
         public bool hourglassRewinded = false;
         public bool talismanPrevented = false;
-        public bool shardResolved = false;
         public bool scytheUsed = false;
         public bool scytheUsedUp = false;
 

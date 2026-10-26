@@ -26,7 +26,7 @@ public class GameManager : MonoBehaviour
 
     public RunModifierState modifierState = new RunModifierState();
 
-    public bool rewinded;
+    public bool shardResolved = false;
 
     public int currentMaxHealth => modifierState.currentMaxHealth;
     public RelicType heldRelic => modifierState.heldRelic;
@@ -246,6 +246,7 @@ public class GameManager : MonoBehaviour
     {
         currentFloor++;
         currentPuzzle = null;
+        shardResolved = false;
         npcSpawnedIndices.Clear();
         SaveRun();
     }
