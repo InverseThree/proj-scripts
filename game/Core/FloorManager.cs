@@ -650,6 +650,8 @@ public class FloorManager : MonoBehaviour
 
     private IEnumerator Rewind()
     {
+        cleared = true;
+
         currentPuzzle.floorState.scytheUsed = false;
         currentPuzzle.floorState.scytheUsedUp = false;
         currentPuzzle.floorState.scytheKillCount = 0;
