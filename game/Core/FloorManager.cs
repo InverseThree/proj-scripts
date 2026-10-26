@@ -39,6 +39,8 @@ public class FloorManager : MonoBehaviour
     private List<ItemType> itemPool = new List<ItemType>();
     private List<RelicType> relicPool = new List<RelicType>();
 
+    private bool cleared = true;
+
     private void OnEnable()
     {
         SceneManager.sceneLoaded += OnSceneLoaded;
@@ -89,8 +91,10 @@ public class FloorManager : MonoBehaviour
     {
 		ClearSpawnedNPCs();
 
-		GameManager.Instance.currentPuzzle = generator.Generate(GameManager.Instance.currentFloor, rng, false, null);
-		PuzzleData puzzle = GameManager.Instance.currentPuzzle;
+        if (cleared)
+            GameManager.Instance.currentPuzzle = generator.Generate(GameManager.Instance.currentFloor, rng, false, null);
+
+        PuzzleData puzzle = GameManager.Instance.currentPuzzle;
 		DistributeAppearances(puzzle);
 		SpawnNPCs(puzzle);
 		ApplyAppearances(puzzle);
@@ -135,7 +139,12 @@ public class FloorManager : MonoBehaviour
 
             if (string.IsNullOrEmpty(puzzle.npcInfo[i].statementText) && puzzle.npcInfo[i].statement != null)
                 puzzle.npcInfo[i].statementText = puzzle.npcInfo[i].statement.ToText(npcLabels, i);
+
+            if (cleared == false && puzzle.npcInfo[i].discovered)
+                StartCoroutine(RevealStatement(i, true));
         }
+
+        cleared = false;
     }
 
     private void SpawnNPCs(PuzzleData puzzle)
@@ -157,7 +166,7 @@ public class FloorManager : MonoBehaviour
 
             index[i] = rng.Next(0, availableSpawns.Count);
 
-			if (!GameManager.Instance.currentPuzzle.floorState.scytheUsed)
+			if (!GameManager.Instance.currentPuzzle.floorState.scytheUsed && cleared)
 			{
 				GameManager.Instance.npcSpawnedIndices.Add(index[i]);
 				spawn = availableSpawns[index[i]];
@@ -192,7 +201,7 @@ public class FloorManager : MonoBehaviour
 
             controller.Setup(this, i, spawnedIndex, puzzle, statementController);
 
-            availableSpawns.RemoveAt(GameManager.Instance.currentPuzzle.floorState.scytheUsed ? GameManager.Instance.npcSpawnedIndices[i] : index[i]);
+            availableSpawns.RemoveAt(GameManager.Instance.currentPuzzle.floorState.scytheUsed ? GameManager.Instance.npcSpawnedIndices[i] : !cleared ? GameManager.Instance.npcSpawnedIndices[i] : index[i]);
             spawnedNPCs.Add(controller);
         }
 
@@ -349,14 +358,16 @@ public class FloorManager : MonoBehaviour
 		yield return new WaitUntil(() => done);
     }
 
-    public void RevealStatement(int npcIndex)
+    public IEnumerator RevealStatement(int npcIndex, bool init)
     {
         if (currentPuzzle == null)
-			return;
+			yield break;
         if (npcIndex < 0 || npcIndex >= currentPuzzle.npcCount)
-			return;
-        if (currentPuzzle.npcInfo[npcIndex].discovered)
-			return;
+			yield break;
+        if (init)
+            yield return new WaitForSeconds(1);
+        else if (currentPuzzle.npcInfo[npcIndex].discovered)
+			yield break;
 
         currentPuzzle.npcInfo[npcIndex].discovered = true;
         answerPanelController.SetStatement(npcIndex, currentPuzzle.npcInfo[npcIndex].statementText);
@@ -455,6 +466,8 @@ public class FloorManager : MonoBehaviour
 
             yield return new WaitUntil(() => itemDone);
         }
+
+        cleared = true;
 
         GameManager.Instance.AdvanceFloor();
 		StartCoroutine(LoadFloor());
@@ -802,7 +815,7 @@ public class FloorManager : MonoBehaviour
     private void RevealSolution()
     {
         for (int i = 0; i < currentPuzzle.npcCount; i++)
-            RevealStatement(i);
+            StartCoroutine(RevealStatement(i, false));
         answerPanelController.RevealAll(currentPuzzle.role);
     }
 

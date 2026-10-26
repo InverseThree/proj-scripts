@@ -40,6 +40,6 @@ public class NPCController: MonoBehaviour
 
     public void OnDialogueFinished()
     {
-        floorManager?.RevealStatement(npcIndex);
+        StartCoroutine(floorManager?.RevealStatement(npcIndex, false));
     }
 }
