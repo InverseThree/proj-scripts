@@ -167,12 +167,12 @@ public class StatementParser
                 switch (variant)
                 {
                     case 0:
-                        // "I am a knight or B is a knight."
-                        return IsKnight(selfIndex) || IsKnight(b);
+                        // "A is a knight, or I am a knight."
+                        return IsKnight(a) || IsKnight(selfIndex);
 
                     case 1:
-                        // "I am a knight or B is a knave."
-                        return IsKnight(selfIndex) || IsKnave(b);
+                        // "A is a knave, or I am a knight."
+                        return IsKnave(a) || IsKnight(selfIndex);
 
                     case 2:
                         // "A is a knight."
@@ -183,7 +183,7 @@ public class StatementParser
                         return !IsKnight(a);
 
                     case 4:
-                        // "A is a knight or B is a knight."
+                        // "A is a knight, or B is a knight."
                         return IsKnight(a) || IsKnight(b);
                 }
                 break;
@@ -200,11 +200,11 @@ public class StatementParser
                         return !IsKnave(a);
 
                     case 2:
-                        // "A is a knave or B is a knight."
+                        // "A is a knave, or B is a knight."
                         return IsKnave(a) || IsKnight(b);
 
                     case 3:
-                        // "A is a knave or B is a knave."
+                        // "A is a knave, or B is a knave."
                         return IsKnave(a) || IsKnave(b);
                 }
                 break;
@@ -315,8 +315,8 @@ public class StatementParser
                 switch (variant)
                 {
                     case 0:
-                        // "Either I am a knight or B is a knave, but not both."
-                        return Xor(IsKnight(selfIndex), IsKnave(b));
+                        // "Either A is a knave or I am a knight, but not both."
+                        return Xor(IsKnave(a), IsKnight(selfIndex));
 
                     case 1:
                         // "Either A is a knight or B is a knave, but not both."
@@ -328,15 +328,15 @@ public class StatementParser
                 switch (variant)
                 {
                     case 0:
-                        // "Either I am a knight or B is a knight, but not both."
-                        return Xor(IsKnight(selfIndex), IsKnight(b));
+                        // "Either A is a knight or I am a knight, but not both."
+                        return Xor(IsKnight(a), IsKnight(selfIndex));
 
                     case 1:
                         // "Either A is a knight or B is a knight, but not both."
                         return Xor(IsKnight(a), IsKnight(b));
 
                     case 2:
-                        // "Neither A nor B is a knight."
+                        // "Neither A nor B are knights."
                         return !IsKnight(a) && !IsKnight(b);
                 }
                 break;
@@ -345,11 +345,11 @@ public class StatementParser
                 switch (variant)
                 {
                     case 0:
-                        // "Neither I nor B is a knave."
-                        return !IsKnave(selfIndex) && !IsKnave(b);
+                        // "Neither A nor I are knaves."
+                        return !IsKnave(a) && !IsKnave(selfIndex);
 
                     case 1:
-                        // "Neither A nor B is a knave."
+                        // "Neither A nor B are knaves."
                         return !IsKnave(a) && !IsKnave(b);
 
                     case 2:
@@ -362,8 +362,8 @@ public class StatementParser
                 switch (variant)
                 {
                     case 0:
-                        // "I and B are both knights."
-                        return IsKnight(selfIndex) && IsKnight(b);
+                        // "A and I are both knights."
+                        return IsKnight(a) && IsKnight(selfIndex);
 
                     case 1:
                         // "A and B are both knights."
@@ -379,8 +379,8 @@ public class StatementParser
                 switch (variant)
                 {
                     case 0:
-                        // "It is not the case that both I and B are knaves."
-                        return !(IsKnave(selfIndex) && IsKnave(b));
+                        // "It is not the case that both A and I are knaves."
+                        return !(IsKnave(a) && IsKnave(selfIndex));
 
                     case 1:
                         // "It is not the case that both A and B are knaves."
@@ -396,12 +396,12 @@ public class StatementParser
                 switch (variant)
                 {
                     case 0:
-                        // "I and B have the same role."
-                        return SameRole(selfIndex, b);
+                        // "A and I have the same role."
+                        return SameRole(a, selfIndex);
 
                     case 1:
-                        // "I and B do not have the same role."
-                        return !SameRole(selfIndex, b);
+                        // "A and I do not have the same role."
+                        return !SameRole(a, selfIndex);
 
                     case 2:
                         // "A and B have the same role."
@@ -584,10 +584,10 @@ public class StatementParser
                 switch (variant)
                 {
                     case 0:
-                        return $"I am a knight or {B} is a knight.";
+                        return $"{A} is a knight,  or I am a knight.";
 
                     case 1:
-                        return $"I am a knight or {B} is a knave.";
+                        return $"{A} is a knave,  or I am a knight.";
 
                     case 2:
                         return $"{A} is a knight.";
@@ -596,7 +596,7 @@ public class StatementParser
                         return $"It is not the case that {A} is a knight.";
 
                     case 4:
-                        return $"{A} is a knight or {B} is a knight.";
+                        return $"{A} is a knight,  or {B} is a knight.";
                 }
                 break;
 
@@ -610,10 +610,10 @@ public class StatementParser
                         return $"It is not the case that {A} is a knave.";
 
                     case 2:
-                        return $"{A} is a knave or {B} is a knight.";
+                        return $"{A} is a knave,  or {B} is a knight.";
 
                     case 3:
-                        return $"{A} is a knave or {B} is a knave.";
+                        return $"{A} is a knave,  or {B} is a knave.";
                 }
                 break;
 
@@ -697,7 +697,7 @@ public class StatementParser
                 switch (variant)
                 {
                     case 0:
-                        return $"Either I am a knight or {B} is a knave,  but not both.";
+                        return $"Either {A} is a knave or I am a knight,  but not both.";
 
                     case 1:
                         return $"Either {A} is a knight or {B} is a knave,  but not both.";
@@ -708,7 +708,7 @@ public class StatementParser
                 switch (variant)
                 {
                     case 0:
-                        return $"Either I am a knight or {B} is a knight,  but not both.";
+                        return $"Either {A} is a knight or I am a knight,  but not both.";
 
                     case 1:
                         return $"Either {A} is a knight or {B} is a knight,  but not both.";
@@ -722,7 +722,7 @@ public class StatementParser
                 switch (variant)
                 {
                     case 0:
-                        return $"Neither I nor {B} are knaves.";
+                        return $"Neither {A} nor I are knaves.";
                     case 1:
                         return $"Neither {A} nor {B} are knaves.";
                     case 2:
@@ -734,7 +734,7 @@ public class StatementParser
                 switch (variant)
                 {
                     case 0:
-                        return $"I and {B} are both knights.";
+                        return $"{A} and I are both knights.";
 
                     case 1:
                         return $"{A} and {B} are both knights.";
@@ -748,7 +748,7 @@ public class StatementParser
                 switch (variant)
                 {
                     case 0:
-                        return $"It is not the case that both I and {B} are knaves.";
+                        return $"It is not the case that both {A} and I are knaves.";
 
                     case 1:
                         return $"It is not the case that both {A} and {B} are knaves.";
@@ -762,10 +762,10 @@ public class StatementParser
                 switch (variant)
                 {
                     case 0:
-                        return $"I and {B} have the same role.";
+                        return $"{A} and I have the same role.";
 
                     case 1:
-                        return $"I and {B} do not have the same role.";
+                        return $"{A} and I do not have the same role.";
 
                     case 2:
                         return $"{A} and {B} have the same role.";
