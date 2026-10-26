@@ -426,11 +426,11 @@ public class StatementParser
 
                     case 2:
                         // "A is a knight when B is a knight, and vice versa."
-                        return SameRole(a, b);
+                        return (IsKnight(a) || !IsKnight(b)) && (!IsKnight(a) || IsKnight(b));
 
                     case 3:
                         // "A is a knight unless B is a knight, and vice versa."
-                        return !SameRole(a, b);
+                        return IsKnight(a) && IsKnight(b);
                 }
                 break;
 
@@ -447,11 +447,11 @@ public class StatementParser
 
                     case 2:
                         // "A is a knight when B is a knave, and vice versa."
-                        return !SameRole(a, b);
+                        return (IsKnight(a) || !IsKnave(b)) && (!IsKnight(a) || IsKnave(b));
 
                     case 3:
                         // "A is a knight unless B is a knave, and vice versa."
-                        return SameRole(a, b);
+                        return IsKnight(a) && IsKnave(b);
                 }
                 break;
 
@@ -468,11 +468,11 @@ public class StatementParser
 
                     case 2:
                         // "A is a knave when B is a knight, and vice versa."
-                        return !SameRole(a, b);
+                        return (IsKnave(a) || !IsKnight(b)) && (!IsKnave(a) || IsKnight(b));
 
                     case 3:
                         // "A is a knave unless B is a knight, and vice versa."
-                        return SameRole(a, b);
+                        return IsKnave(a) && IsKnight(b);
                 }
                 break;
 
@@ -489,11 +489,11 @@ public class StatementParser
 
                     case 2:
                         // "A is a knave when B is a knave, and vice versa."
-                        return SameRole(a, b);
+                        return (IsKnave(a) || !IsKnave(b)) && (!IsKnave(a) || IsKnave(b));
 
                     case 3:
                         // "A is a knave unless B is a knave, and vice versa."
-                        return !SameRole(a, b);
+                        return IsKnave(a) && IsKnave(b);
                 }
                 break;
 
@@ -510,7 +510,7 @@ public class StatementParser
 
                     case 2:
                         // "A being a knight is both necessary and sufficient for B to be a knight."
-                        return SameRole(a, b);
+                        return (IsKnight(a) || !IsKnight(b)) && (!IsKnight(a) || IsKnight(b));
                 }
                 break;
 
@@ -527,7 +527,7 @@ public class StatementParser
 
                     case 2:
                         // "A being a knight is both necessary and sufficient for B to be a knave."
-                        return !SameRole(a, b);
+                        return (IsKnight(a) || !IsKnave(b)) && (!IsKnight(a) || IsKnave(b));
                 }
                 break;
 
@@ -544,7 +544,7 @@ public class StatementParser
 
                     case 2:
                         // "A being a knave is both necessary and sufficient for B to be a knight."
-                        return !SameRole(a, b);
+                        return (IsKnave(a) || !IsKnight(b)) && (!IsKnave(a) || IsKnight(b));
                 }
                 break;
 
@@ -561,7 +561,7 @@ public class StatementParser
 
                     case 2:
                         // "A being a knave is both necessary and sufficient for B to be a knave."
-                        return SameRole(a, b);
+                        return (IsKnave(a) || !IsKnave(b)) && (!IsKnave(a) || IsKnave(b));
                 }
                 break;
         }
