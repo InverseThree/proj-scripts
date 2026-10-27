@@ -40,6 +40,7 @@ public class FloorManager : MonoBehaviour
     private List<RelicType> relicPool = new List<RelicType>();
 
     private bool cleared = true;
+    private bool inited = false;
 
     private void OnEnable()
     {
@@ -53,8 +54,6 @@ public class FloorManager : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        StopAllCoroutines();
-
         statementController = FindObjectOfType<StatementController>();
         answerPanelController = FindObjectOfType<AnswerPanelController>();
         popupPanelController = FindObjectOfType<PopupPanelController>();
@@ -85,6 +84,8 @@ public class FloorManager : MonoBehaviour
         }
 
         GenerateFloor();
+
+        inited = true;
     }
 
     public void GenerateFloor()
@@ -365,7 +366,7 @@ public class FloorManager : MonoBehaviour
         if (npcIndex < 0 || npcIndex >= currentPuzzle.npcCount)
 			yield break;
         if (init)
-            yield return new WaitForSeconds(1);
+            yield return new WaitUntil(() => inited);
         else if (currentPuzzle.npcInfo[npcIndex].discovered)
 			yield break;
 
@@ -470,7 +471,7 @@ public class FloorManager : MonoBehaviour
         cleared = true;
 
         GameManager.Instance.AdvanceFloor();
-		StartCoroutine(LoadFloor());
+		yield return StartCoroutine(LoadFloor());
     }
 
     public void OnItemSlotClicked()
@@ -677,10 +678,12 @@ public class FloorManager : MonoBehaviour
         answerPanelController.BuildFromPuzzle(GameManager.Instance.currentPuzzle);
 
 		if (retakeDamage)
-		{
-			currentPuzzle.floorState.talismanPrevented = false;
+        {
+            if (GameManager.Instance.modifierState.brushActive && currentPuzzle.floorState.brushEffect != 3)
+                yield break;
+
 			GameManager.Instance.TryTakeDamage(1, out _, out _);
-		}
+        }
     }
 
     private void MakeWish(LampPanelController.LampWishRequest request)
@@ -839,9 +842,13 @@ public class FloorManager : MonoBehaviour
 
 	private IEnumerator LoadFloor()
 	{
+        inited = false;
+
         if (screenFader != null)
             yield return screenFader.FadeOut(0.35f);
 
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+
+        yield return new WaitUntil(() => inited);
 	}
 }
