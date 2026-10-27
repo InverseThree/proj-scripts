@@ -1,12 +1,12 @@
 scripts for [this](https://github.com/InverseThree/logicAppProj), don't steal w/o my permission
 
 # patch notes
-## V1.1.2(2026 Oct 28)
+## V1.1.2 (2026 Oct 28)
 ### QOL improvement<br/>
 now the 1 peasant rule for floor 10+ will also be shown as a hint
 ### bug fixes<br/>
 fix a bug where volume resets to default value when returning to title<br/>
-fix a bug where the old variants for statement type 'EitherKnightOrKnave' can still appear in the mini-game w/ incorrect logic<br/>
+fix a bug where the old variants for statement type 'EitherKnightOrKnave' could still appear in the mini-game w/ incorrect logic<br/>
 fix a bug where the biconditional statements contain incorrect logic<br/>
 fix a bug where game isn't progressing after returning to main menu via methods other than pause menu<br/>
 fix a bug where floor will regenerate after returning to main menu<br/>
