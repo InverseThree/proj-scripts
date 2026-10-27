@@ -1,6 +1,22 @@
 scripts for [this](https://github.com/InverseThree/logicAppProj), don't steal w/o my permission
 
 # patch notes
+## V1.1.2(2026 Oct 28)
+### QOL improvement<br/>
+now the 1 peasant rule for floor 10+ will also be shown as a hint
+### bug fixes<br/>
+fix a bug where volume resets to default value when returning to title<br/>
+fix a bug where the old variants for statement type 'EitherKnightOrKnave' can still appear in the mini-game w/ incorrect logic<br/>
+fix a bug where the biconditional statements contain incorrect logic<br/>
+fix a bug where game isn't progressing after returning to main menu via methods other than pause menu<br/>
+fix a bug where floor will regenerate after returning to main menu<br/>
+fix a bug where items selection panel doesn't appear when rolling into 4 NPCs for the 1st time in a floor after hourglass is used while holding brush<br/>
+fix a bug where talisman's effect is still active after hourglass is used when damage was already prevented while holding talisman or brush (and rolling into 3 NPCs twice)<br/>
+fix a bug where scythe removes existing hints when used
+### other changes<br/>
+fix broken grammar for conjunctions and disjunctions involving the speaker<br/>
+add in-game credit
+
 ## V1.1.1 (2026 May 21)
 ### balance changes<br/>
 #### Brush of Chaos
@@ -39,7 +55,7 @@ new: "Upon pick up, hide all names mentioned in a random inhabitant's statement 
 ### major update<br/>
 #### summary
 add hints for the tutorial chapters so it's friendlier for beginner to pass the quizzes. also adjust the statement pool with new statements and refined statements' difficulty level since i find the old ver. being too easy (even tho i still have close to 100% winrate in the new patch), plus other miscellaneous changes
-#### new statements pool for the mini-game (npcs can't refer themselves as kanve)
+#### new statements pool for the mini-game (npcs can't refer themselves as knave)
 ##### easy pool
 P's/isn't a knight/knave.<br/>
 I'm/P's a knight/knave or Q's a knight/knave.<br/>
@@ -145,7 +161,7 @@ Reveal the number of knights and knaves on this floor (can be wished thrice).
 ## V0.1 (2026 Apr 29)
 ### 1st commit
 1st ver. of the proj
-#### statements pool for the mini-game (npcs can't refer themselves as kanve)
+#### statements pool for the mini-game (npcs can't refer themselves as knave)
 ##### easy pool
 P's/isn't a knight/knave.
 ##### medium pool
