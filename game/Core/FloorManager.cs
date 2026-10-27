@@ -101,9 +101,6 @@ public class FloorManager : MonoBehaviour
 		ApplyAppearances(puzzle);
 		InitializeFloor(puzzle);
 
-        if (GameManager.Instance.currentFloor >= 10)
-            puzzle.hints.Add("Floor Rule:  Exactly one inhabitant is a peasant.");
-
 		ModifyDisplayText(puzzle);
 		hintLogController.BuildFromPuzzle(puzzle);
 
@@ -279,6 +276,9 @@ public class FloorManager : MonoBehaviour
 
     private void ModifyDisplayText(PuzzleData puzzle)
     {
+        if (GameManager.Instance.currentFloor >= 10)
+            puzzle.hints.Add("Floor Rule:  Exactly one inhabitant is a peasant.");
+
         if (GameManager.Instance.modifierState.lampActive && puzzle.floorState.lampHiddenIndex < 0)
         {
             List<int> candidates = new List<int>();
@@ -519,14 +519,19 @@ public class FloorManager : MonoBehaviour
 						    for (int i = 0; i < currentPuzzle.npcCount; i++)
 						        Debug.Log($"POST-REROLL ROLE {i}: {currentPuzzle.role[i]}");
 
-						    currentPuzzle.hints.Clear();
-						    state.ClearDerivedFloorHints();
-
 						    ClearSpawnedNPCs();
 
 						    SpawnNPCs(currentPuzzle);
 						    DistributeAppearances(currentPuzzle);
 						    ApplyAppearances(currentPuzzle);
+
+                            bool mirrorUsed = currentPuzzle.floorState.mirrorHintA >= 0 && currentPuzzle.floorState.mirrorHintB >= 0;
+                            if (mirrorUsed)
+                                GameManager.Instance.modifierState.mirrorPending = true;
+
+						    currentPuzzle.hints.Clear();
+						    state.ClearDerivedFloorHints();
+                            ModifyDisplayText(currentPuzzle);
 
 						    answerPanelController.BuildFromPuzzle(GameManager.Instance.currentPuzzle);
 						    hintLogController.BuildFromPuzzle(GameManager.Instance.currentPuzzle);
