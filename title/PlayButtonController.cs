@@ -21,6 +21,7 @@ public class PlayButtonController : MonoBehaviour
         for (int i = 0; i < toggles.Length; i++)
             toggles[i].interactable = (i < unlock);
     }
+
     private void Update()
     {
         bool anyOn = false;

@@ -149,7 +149,7 @@ public class PopupPanelController : MonoBehaviour
             if (panel.transform.Find("gameClear").gameObject.activeSelf)
                 GameManager.Instance.StartNewRun();
 
-            GameManager.Instance.AdvanceFloor();
+            RunFloorCleared();
         }
         SceneManager.LoadScene("title");
     }
