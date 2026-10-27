@@ -9,9 +9,13 @@ public class titleController : MonoBehaviour
     private Button settingsButton;
     private Button playButton;
 
+    private Button creditButton;
+    private Button returnButton;
+
     private Animator titleAnim;
 
     private GameObject playMenu;
+    private GameObject credit;
     private GameObject option;
 
     private static int lastState;
@@ -26,17 +30,35 @@ public class titleController : MonoBehaviour
        settingsButton = GameObject.FindGameObjectWithTag("settingsButton").GetComponent<Button>();
        playButton = GameObject.FindGameObjectWithTag("playButton").GetComponent<Button>();
 
+       creditButton = GameObject.FindGameObjectWithTag("creditButton").GetComponent<Button>();
+       returnButton = GameObject.FindGameObjectWithTag("returnButton").GetComponent<Button>();
+
        titleAnim = GetComponent<Animator>();
 
        playMenu = GameObject.FindGameObjectWithTag("playMenu");
+       credit = GameObject.FindGameObjectWithTag("credit");
        option = GameObject.FindGameObjectWithTag("option");
 
+       creditButton.onClick.AddListener(ShowCredit);
+       returnButton.onClick.AddListener(ExitCredit);
+
        playMenu.SetActive(false);
+       credit.SetActive(false);
        option.SetActive(false);
 
        exitButton.onClick.AddListener(Exit);
        settingsButton.onClick.AddListener(Option);
        playButton.onClick.AddListener(Play);
+    }
+
+    private void ShowCredit()
+    {
+        credit.SetActive(true);
+    }
+
+    private void ExitCredit()
+    {
+        credit.SetActive(false);
     }
 
     private void Exit()
